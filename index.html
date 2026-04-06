@@ -4,126 +4,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Winflex — Asistencia</title>
-<!-- SheetJS para LEER el XLS del reloj -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- ExcelJS para GENERAR el Excel formateado -->
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 <style>
-:root{--bg:#f0f2f5;--surface:#fff;--card:#fff;--card2:#f8f9fb;--border:#dde1e7;--accent:#1a56e8;--accent-light:#edf2fe;--green:#0e7a3c;--green-light:#edfaf2;--orange:#c4620a;--orange-light:#fff4e8;--red:#c8291e;--red-light:#fef2f1;--text:#1a1f36;--text-dim:#5a6072;--text-muted:#9aa0b0;--shadow:0 1px 3px rgba(0,0,0,.08);--r:10px}
+:root{--bg:#f0f2f5;--sur:#fff;--card:#fff;--c2:#f8f9fb;--brd:#dde1e7;--acc:#1a56e8;--al:#edf2fe;--grn:#0e7a3c;--gl:#edfaf2;--org:#c4620a;--ol:#fff4e8;--red:#c8291e;--rl:#fef2f1;--txt:#1a1f36;--dim:#5a6072;--mut:#9aa0b0;--r:10px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
-.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:54px;gap:16px;box-shadow:var(--shadow)}
-.hdr-logo{font-size:15px;font-weight:700;color:var(--text)}.hdr-logo em{color:var(--accent);font-style:normal}
-.hdr-steps{display:flex;align-items:center;gap:2px;margin-left:auto}
-.hdr-step{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:6px;color:var(--text-muted);font-size:12px;font-weight:500;transition:.18s}
-.hdr-step.active{background:var(--accent-light);color:var(--accent);font-weight:600}
-.hdr-step.done{color:var(--green)}
-.step-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
-.hdr-sep{width:20px;height:1px;background:var(--border)}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
+.hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:0 28px;display:flex;align-items:center;height:54px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.logo{font-size:15px;font-weight:700}.logo em{color:var(--acc);font-style:normal}
+.steps{display:flex;align-items:center;gap:2px;margin-left:auto}
+.step{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:6px;color:var(--mut);font-size:12px;font-weight:500}
+.step.on{background:var(--al);color:var(--acc);font-weight:600}.step.done{color:var(--grn)}
+.dot{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sep{width:20px;height:1px;background:var(--brd)}
 .wrap{max-width:980px;margin:0 auto;padding:26px 18px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px;box-shadow:var(--shadow)}
-.card-hd{font-weight:600;font-size:14px;margin-bottom:16px;color:var(--text)}
-.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--card2)}
-.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-light)}
-.drop-zone .dz-icon{font-size:38px;margin-bottom:10px}
-.drop-zone p{color:var(--text-dim);line-height:1.6}
-.drop-zone strong{color:var(--accent)}
-.period-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.fg{display:flex;flex-direction:column;gap:6px}
-.fg label{font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-select,input[type=number]{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:14px;outline:none;transition:.18s}
-select:focus,input:focus{border-color:var(--accent)}
-.quinc-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
-.quinc-opt{flex:1;padding:9px 14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-dim);background:var(--surface);transition:.15s;border:none;outline:none;white-space:nowrap}
-.quinc-opt:first-child{border-right:1px solid var(--border)}
-.quinc-opt.sel{background:var(--accent);color:#fff}
-.quinc-opt:not(.sel):hover{background:var(--accent-light);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.hd{font-weight:600;font-size:14px;margin-bottom:14px}
+.drop{border:2px dashed var(--brd);border-radius:var(--r);padding:32px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--c2)}
+.drop:hover,.drop.drag{border-color:var(--acc);background:var(--al)}
+.drop p{color:var(--dim);line-height:1.6}.drop strong{color:var(--acc)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:11px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+select,input[type=number]{background:var(--sur);border:1.5px solid var(--brd);border-radius:8px;padding:9px 12px;color:var(--txt);font-size:14px;outline:none}
+select:focus,input:focus{border-color:var(--acc)}
+.qt{display:flex;border:1.5px solid var(--brd);border-radius:8px;overflow:hidden}
+.qo{flex:1;padding:9px 14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--dim);background:var(--sur);border:none;outline:none;white-space:nowrap}
+.qo:first-child{border-right:1px solid var(--brd)}
+.qo.s{background:var(--acc);color:#fff}.qo:not(.s):hover{background:var(--al);color:var(--acc)}
 .btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(26,86,232,.3)}
-.btn-primary:hover{background:#1445c4}
-.btn-success{background:var(--green);color:#fff}
-.btn-success:hover{background:#0b6432}
-.btn-ghost{background:transparent;color:var(--text-dim);border:1.5px solid var(--border)}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-.btn-lg{padding:12px 26px;font-size:14px}
-.status{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;border:1px solid transparent}
-.status.ok{background:var(--green-light);border-color:rgba(14,122,60,.2);color:var(--green)}
-.status.err{background:var(--red-light);border-color:rgba(200,41,30,.2);color:var(--red)}
-.status.warn{background:#fff8e1;border-color:#f0c040;color:#7a5800}
-.emp-list{display:flex;flex-direction:column}
-.emp-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
-.emp-row:last-child{border-bottom:none}
-.emp-leg{font-size:11px;font-weight:700;color:var(--text-muted);width:28px;text-align:right;flex-shrink:0}
-.emp-name-inp{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;outline:none}
-.emp-name-inp:focus{border-color:var(--accent)}
-.emp-excl-btn{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;transition:.15s}
-.emp-excl-btn:hover{border-color:var(--red);color:var(--red)}
-.emp-excl-btn.on{border-color:var(--red);color:var(--red);background:var(--red-light)}
-.weeks-list{display:flex;flex-direction:column;gap:10px}
-.week-block{background:var(--card2);border:1.5px solid var(--border);border-radius:9px;padding:14px 16px}
-.week-title{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.bp{background:var(--acc);color:#fff}.bp:hover{background:#1445c4}
+.bs{background:var(--grn);color:#fff}.bs:hover{background:#0b6432}
+.bg{background:transparent;color:var(--dim);border:1.5px solid var(--brd)}.bg:hover{border-color:var(--acc);color:var(--acc)}
+.blg{padding:12px 26px;font-size:14px}
+.st{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;border:1px solid transparent}
+.ok{background:var(--gl);border-color:rgba(14,122,60,.2);color:var(--grn)}
+.er{background:var(--rl);border-color:rgba(200,41,30,.2);color:var(--red)}
+.wn{background:#fff8e1;border-color:#f0c040;color:#7a5800}
+.el{display:flex;flex-direction:column}
+.er-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd)}
+.er-row:last-child{border-bottom:none}
+.leg{font-size:11px;font-weight:700;color:var(--mut);width:28px;text-align:right}
+.ni{flex:1;background:var(--c2);border:1px solid var(--brd);border-radius:6px;padding:6px 10px;color:var(--txt);font-size:13px;outline:none}
+.xb{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--brd);background:transparent;color:var(--dim);cursor:pointer}
+.xb.on{border-color:var(--red);color:var(--red);background:var(--rl)}
+.wl{display:flex;flex-direction:column;gap:10px}
+.wb{background:var(--c2);border:1.5px solid var(--brd);border-radius:9px;padding:14px 16px}
+.wt{font-size:11px;font-weight:700;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;transition:.15s;background:var(--surface);color:var(--text-dim);user-select:none}
-.chip:hover{border-color:var(--orange);color:var(--orange)}
-.chip.on{border-color:var(--orange);background:var(--orange-light);color:var(--orange);font-weight:600}
-.chip-reset{border-style:dashed;font-size:11px}
-.chip-reset:hover{border-color:var(--text-muted)!important;color:var(--text-dim)!important}
-.tbl-wrap{overflow-x:auto}
+.chip{padding:5px 13px;border-radius:20px;border:1.5px solid var(--brd);font-size:12px;cursor:pointer;background:var(--sur);color:var(--dim);user-select:none}
+.chip:hover{border-color:var(--org);color:var(--org)}
+.chip.on{border-color:var(--org);background:var(--ol);color:var(--org);font-weight:600}
+.cr{border-style:dashed;font-size:11px}
+.tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-thead tr th{background:var(--card2);padding:9px 12px;text-align:left;color:var(--text-dim);font-weight:600;border-bottom:2px solid var(--border);white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--border)}
+thead th{background:var(--c2);padding:9px 12px;text-align:left;color:var(--dim);font-weight:600;border-bottom:2px solid var(--brd);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--brd)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#f5f6f9}
-tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--border)}
-.num{text-align:right}.fw7{font-weight:700}
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
-.badge-tm{background:var(--accent-light);color:var(--accent)}
-.badge-tn{background:var(--orange-light);color:var(--orange)}
-.success-box{text-align:center;padding:36px 20px}
-.success-box .s-ico{font-size:52px;margin-bottom:12px}
-.success-box h2{font-size:21px;font-weight:700;margin-bottom:6px}
-.success-box .sub{color:var(--text-dim);margin-bottom:22px}
-.hidden{display:none!important}
-.small{font-size:12px;color:var(--text-dim)}
-.loading{text-align:center;padding:32px;color:var(--text-dim)}
-.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
+tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
+.nr{text-align:right}.fw{font-weight:700}
+.bx{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.btm{background:var(--al);color:var(--acc)}.btn2{background:var(--ol);color:var(--org)}
+.sc{text-align:center;padding:36px 20px}
+.sc .ico{font-size:52px;margin-bottom:12px}
+.sc h2{font-size:21px;font-weight:700;margin-bottom:6px}
+.sc .sub{color:var(--dim);margin-bottom:22px}
+.hid{display:none!important}
+.sm{font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="hdr-logo">WINFLEX <em>| Asistencia</em></div>
-  <div class="hdr-steps">
-    <div class="hdr-step active" id="s1b"><div class="step-dot">1</div> Cargar</div>
-    <div class="hdr-sep"></div>
-    <div class="hdr-step" id="s2b"><div class="step-dot">2</div> Turno Noche</div>
-    <div class="hdr-sep"></div>
-    <div class="hdr-step" id="s3b"><div class="step-dot">3</div> Descargar</div>
+  <div class="logo">WINFLEX <em>| Asistencia</em></div>
+  <div class="steps">
+    <div class="step on" id="s1"><div class="dot">1</div> Cargar</div>
+    <div class="sep"></div>
+    <div class="step" id="s2"><div class="dot">2</div> Turno Noche</div>
+    <div class="sep"></div>
+    <div class="step" id="s3"><div class="dot">3</div> Descargar</div>
   </div>
 </div>
 
 <div class="wrap">
 
-  <!-- PASO 1 -->
-  <div id="pg1">
+  <div id="p1">
     <div class="card">
-      <div class="card-hd">📂 Archivo del reloj biométrico</div>
-      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fi').click()">
-        <div class="dz-icon">📋</div>
-        <p><strong>Clic para seleccionar</strong> o arrastrar el archivo aquí</p>
-        <p class="small" style="margin-top:5px">Formato: 1_report.xls — exportación del reloj (hoja "Reporte de Asistencia")</p>
+      <div class="hd">📂 Archivo del reloj biométrico</div>
+      <div class="drop" id="dz" onclick="document.getElementById('fi').click()">
+        <p style="font-size:36px;margin-bottom:8px">📋</p>
+        <p><strong>Clic para seleccionar</strong> o arrastrá el archivo aquí</p>
+        <p class="sm" style="margin-top:5px">Formato: 1_report.xls — buscará la hoja "Reporte de Asistencia"</p>
       </div>
       <input type="file" id="fi" accept=".xls,.xlsx" style="display:none">
-      <div id="fileStatus" class="hidden"></div>
+      <div id="fst" class="hid"></div>
+    </div>
+
+    <div class="card hid" id="mapCard">
+      <div class="hd">🔎 Confirmá las columnas del archivo</div>
+      <p class="sm" style="margin-bottom:14px">La app detectó estas columnas. Corregí si alguna no es correcta:</p>
+      <div class="row" style="margin-bottom:16px">
+        <div class="fg"><label>Legajo / ID empleado</label><select id="cId"></select></div>
+        <div class="fg"><label>Fecha</label><select id="cFecha"></select></div>
+        <div class="fg"><label>Hora</label><select id="cHora"></select></div>
+      </div>
+      <p class="sm" style="margin-bottom:8px;font-weight:600">Primeras filas del archivo:</p>
+      <div class="tw" id="rawPrev"></div>
     </div>
 
     <div class="card">
-      <div class="card-hd">📅 Período a liquidar</div>
-      <div class="period-row">
-        <div class="fg">
-          <label>Mes</label>
-          <select id="selMes">
+      <div class="hd">📅 Período a liquidar</div>
+      <div class="row">
+        <div class="fg"><label>Mes</label>
+          <select id="sm">
             <option value="1">Enero</option><option value="2">Febrero</option>
             <option value="3">Marzo</option><option value="4">Abril</option>
             <option value="5">Mayo</option><option value="6">Junio</option>
@@ -132,87 +125,76 @@ tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--bord
             <option value="11">Noviembre</option><option value="12">Diciembre</option>
           </select>
         </div>
-        <div class="fg">
-          <label>Año</label>
-          <input type="number" id="inpAnio" value="2026" min="2024" max="2030" style="width:100px">
+        <div class="fg"><label>Año</label>
+          <input type="number" id="sa" value="2026" min="2024" max="2030" style="width:100px">
         </div>
-        <div class="fg">
-          <label>Quincena</label>
-          <div class="quinc-toggle">
-            <button class="quinc-opt sel" id="q1btn" onclick="selQuinc(1)">1° Quincena (1–15)</button>
-            <button class="quinc-opt" id="q2btn" onclick="selQuinc(2)">2° Quincena (16–fin)</button>
+        <div class="fg"><label>Quincena</label>
+          <div class="qt">
+            <button class="qo s" id="q1" onclick="setQ(1)">1° Quincena (1–15)</button>
+            <button class="qo" id="q2" onclick="setQ(2)">2° Quincena (16–fin)</button>
           </div>
         </div>
       </div>
-      <p class="small" id="rangoInfo" style="margin-top:10px"></p>
+      <p class="sm" id="rng" style="margin-top:10px"></p>
     </div>
 
     <div class="card">
-      <div class="card-hd">👥 Nómina de empleados</div>
-      <p class="small" style="margin-bottom:14px">Editá nombres o marcá como excluido para omitirlo de este reporte.</p>
-      <div class="emp-list" id="empEditor"></div>
+      <div class="hd">👥 Nómina</div>
+      <p class="sm" style="margin-bottom:12px">Editá nombres o excluí temporalmente del reporte.</p>
+      <div class="el" id="empEd"></div>
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="goStep2()">Continuar →</button>
+    <button class="btn bp blg" onclick="irPaso2()">Continuar →</button>
   </div>
 
-  <!-- PASO 2 -->
-  <div id="pg2" class="hidden">
+  <div id="p2" class="hid">
     <div class="card">
-      <div class="card-hd">🌙 Turno Noche — <span id="pgdLabel" style="color:var(--text-dim);font-weight:400;font-size:13px"></span></div>
-      <p class="small" style="margin-bottom:16px">Seleccioná quién estuvo de noche en cada semana. El turno noche suma +1 hs base por día trabajado.</p>
-      <div class="weeks-list" id="weeksContainer"></div>
+      <div class="hd">🌙 Turno Noche — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
+      <p class="sm" style="margin-bottom:14px">Seleccioná quién estuvo de noche en cada semana (+1 hs base por día trabajado en TN).</p>
+      <div class="wl" id="semCont"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn btn-ghost" onclick="goStep(1)">← Atrás</button>
-      <button class="btn btn-primary" id="btnGenerar" onclick="generarExcel()">⚡ Generar Excel</button>
+      <button class="btn bg" onclick="ir(1)">← Atrás</button>
+      <button class="btn bp" onclick="genExcel()">⚡ Generar Excel</button>
     </div>
   </div>
 
-  <!-- PASO 3 -->
-  <div id="pg3" class="hidden">
+  <div id="p3" class="hid">
     <div class="card">
-      <div class="success-box">
-        <div class="s-ico">✅</div>
+      <div class="sc">
+        <div class="ico">✅</div>
         <h2>Excel generado</h2>
-        <div class="sub" id="excelInfo"></div>
-        <button class="btn btn-success btn-lg" id="btnDL">⬇️ Volver a descargar</button>
+        <div class="sub" id="xlInfo"></div>
+        <button class="btn bs blg" id="btnDL">⬇️ Volver a descargar</button>
       </div>
     </div>
     <div class="card">
-      <div class="card-hd">📊 Resumen del período</div>
-      <div class="tbl-wrap" id="previewTbl"></div>
+      <div class="hd">📊 Resumen del período</div>
+      <div class="tw" id="prevTbl"></div>
     </div>
-    <div style="margin-top:14px">
-      <button class="btn btn-ghost" onclick="goStep(1)">← Nuevo reporte</button>
-    </div>
+    <div style="margin-top:14px"><button class="btn bg" onclick="ir(1)">← Nuevo reporte</button></div>
   </div>
 
 </div>
 
 <script>
-// ============================================================
-// DATOS FIJOS
-// ============================================================
-const EMPLEADOS_DEF = [
-  { id: 3,  nombre: "Brest Juan Andrés" },
-  { id: 20, nombre: "Luna Gabriel Ignacio" },
-  { id: 22, nombre: "Vera Juan Alberto" },
-  { id: 18, nombre: "Silva Silvina Viviana" },
-  { id: 21, nombre: "Rodriguez Alan Damian" },
-  { id: 25, nombre: "Moreno Fernando Ezequiel" },
-  { id: 27, nombre: "Delelis Matías Emanuel" },
-  { id: 28, nombre: "Rodriguez Carlos Andrés" },
-  { id: 49, nombre: "Herrera Fatima" },
-  { id: 32, nombre: "Delelis Alejandro Alexis" },
-  { id: 52, nombre: "Vera Alan" },
-  { id: 51, nombre: "Garbia Luis Jorge" },
-  { id: 55, nombre: "Jose Antonio" },
+const EMP_DEF = [
+  {id:3, n:"Brest Juan Andrés"},
+  {id:20,n:"Luna Gabriel Ignacio"},
+  {id:22,n:"Vera Juan Alberto"},
+  {id:18,n:"Silva Silvina Viviana"},
+  {id:21,n:"Rodriguez Alan Damian"},
+  {id:25,n:"Moreno Fernando Ezequiel"},
+  {id:27,n:"Delelis Matías Emanuel"},
+  {id:28,n:"Rodriguez Carlos Andrés"},
+  {id:49,n:"Herrera Fatima"},
+  {id:32,n:"Delelis Alejandro Alexis"},
+  {id:52,n:"Vera Alan"},
+  {id:51,n:"Garbia Luis Jorge"},
+  {id:55,n:"Jose Antonio"},
 ];
-
-const EXCLUIDOS_FIJOS = new Set([1, 15, 16, 50, 10000]);
-
-const FERIADOS = new Set([
+const EXCL_FIJOS = new Set([1,15,16,50,10000]);
+const FERIAS = new Set([
   "2025-01-01","2025-03-03","2025-03-04","2025-03-24","2025-04-02",
   "2025-04-17","2025-04-18","2025-05-01","2025-05-25","2025-06-16",
   "2025-07-09","2025-08-17","2025-10-12","2025-11-21","2025-12-08","2025-12-25",
@@ -221,582 +203,342 @@ const FERIADOS = new Set([
   "2026-06-15","2026-07-09","2026-08-17","2026-10-12","2026-11-20",
   "2026-12-08","2026-12-25",
 ]);
+const MN = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DN = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
 
-const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const DOW_NOM = ['DOM.','LUN.','MAR.','MIE.','JUE.','VIE.','SAB.'];
+let EMPS = EMP_DEF.map(e=>({...e, excl:false}));
+let rawData = null, Q=1, MES, ANIO, SEMS=[], TN={}, lastWB=null, lastFN='';
 
-// Colores Excel (ARGB)
-const CLR = {
-  headerDia:  'FF2E75B6',  // azul oscuro - día de semana
-  headerWE:   'FFF4CCCC',  // rosa - fin de semana
-  headerFer:  'FFFFD966',  // amarillo - feriado
-  headerTot:  'FFC6EFCE',  // verde - total
-  nameGreen:  'FF00B050',  // verde - nombre empleado
-  turnoDia:   'FFE8F0FE',  // azul muy claro - turno día
-  turnoWE:    'FFF4CCCC',  // rosa
-  baseDia:    'FFEBF3FB',  // azul claro
-  baseWE:     'FFF4CCCC',  // rosa
-  extra:      'FFFFF2CC',  // amarillo claro
-  extraWE:    'FFF4CCCC',  // rosa
-  totalDia:   'FFE2EFDA',  // verde claro
-  totalWE:    'FFF4CCCC',  // rosa
-  feriado:    'FFFFD966',  // amarillo
-  sinSalida:  'FFFFCCCC',  // rojo claro (sin salida)
-  blanco:     'FFFFFFFF',
-};
+// Init
+const n=new Date();
+document.getElementById('sm').value=n.getMonth()+1;
+document.getElementById('sa').value=n.getFullYear();
+renderEmps(); updRng();
+document.getElementById('sm').onchange=updRng;
+document.getElementById('sa').onchange=updRng;
 
-// ============================================================
-// ESTADO
-// ============================================================
-let EMPLEADOS = EMPLEADOS_DEF.map(e => ({ ...e, excl: false }));
-let rawData = null;
-let quincena = 1;
-let mes, anio;
-let semanas = [];
-let tnPorSemana = {};
-let lastBuffer = null;
-let lastFilename = '';
-
-// ============================================================
-// INIT
-// ============================================================
-const now = new Date();
-document.getElementById('selMes').value = now.getMonth() + 1;
-document.getElementById('inpAnio').value = now.getFullYear();
-renderEmpEditor();
-actualizarRango();
-document.getElementById('selMes').addEventListener('change', actualizarRango);
-document.getElementById('inpAnio').addEventListener('change', actualizarRango);
-
-// ============================================================
-// QUINCENA
-// ============================================================
-function selQuinc(q) {
-  quincena = q;
-  document.getElementById('q1btn').classList.toggle('sel', q === 1);
-  document.getElementById('q2btn').classList.toggle('sel', q === 2);
-  actualizarRango();
+function setQ(q){Q=q;document.getElementById('q1').classList.toggle('s',q===1);document.getElementById('q2').classList.toggle('s',q===2);updRng();}
+function updRng(){
+  const m=+document.getElementById('sm').value, y=+document.getElementById('sa').value;
+  const ult=new Date(y,m,0).getDate();
+  const d1=Q===1?1:16, d2=Q===1?15:ult;
+  document.getElementById('rng').textContent=`Período: ${d1} al ${d2} de ${MN[m]} ${y}`;
 }
 
-function actualizarRango() {
-  const m = parseInt(document.getElementById('selMes').value);
-  const y = parseInt(document.getElementById('inpAnio').value);
-  const ult = new Date(y, m, 0).getDate();
-  const desde = quincena === 1 ? 1 : 16;
-  const hasta = quincena === 1 ? 15 : ult;
-  document.getElementById('rangoInfo').textContent =
-    `Período: ${desde} al ${hasta} de ${MESES[m]} ${y}`;
-}
+function ir(n){[1,2,3].forEach(i=>{
+  document.getElementById('p'+i).classList.toggle('hid',i!==n);
+  const b=document.getElementById('s'+i);
+  b.className='step'+(i===n?' on':i<n?' done':'');
+});window.scrollTo(0,0);}
 
-// ============================================================
-// NAVEGACIÓN
-// ============================================================
-function goStep(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById(`pg${i}`).classList.toggle('hidden', i !== n);
-    const b = document.getElementById(`s${i}b`);
-    b.className = 'hdr-step' + (i===n?' active':i<n?' done':'');
-  });
-  window.scrollTo(0,0);
-}
-
-// ============================================================
-// EMPLEADOS EDITOR
-// ============================================================
-function renderEmpEditor() {
-  document.getElementById('empEditor').innerHTML = EMPLEADOS.map((e, i) => `
-    <div class="emp-row">
-      <div class="emp-leg">${e.id}</div>
-      <input class="emp-name-inp" type="text" value="${e.nombre}" onchange="EMPLEADOS[${i}].nombre=this.value">
-      <button class="emp-excl-btn ${e.excl?'on':''}" onclick="toggleExcl(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button>
+function renderEmps(){
+  document.getElementById('empEd').innerHTML=EMPS.map((e,i)=>`
+    <div class="er-row">
+      <div class="leg">${e.id}</div>
+      <input class="ni" type="text" value="${e.n}" onchange="EMPS[${i}].n=this.value">
+      <button class="xb ${e.excl?'on':''}" onclick="toggleX(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button>
     </div>`).join('');
 }
+function toggleX(i,b){EMPS[i].excl=!EMPS[i].excl;b.textContent=EMPS[i].excl?'✕ Excluido':'Activo';b.classList.toggle('on',EMPS[i].excl);}
 
-function toggleExcl(i, btn) {
-  EMPLEADOS[i].excl = !EMPLEADOS[i].excl;
-  btn.textContent = EMPLEADOS[i].excl ? '✕ Excluido' : 'Activo';
-  btn.classList.toggle('on', EMPLEADOS[i].excl);
-}
+// --- FILE LOAD ---
+const dz=document.getElementById('dz');
+document.getElementById('fi').onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0]);};
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');};
+dz.ondragleave=()=>dz.classList.remove('drag');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);};
 
-// ============================================================
-// CARGA DEL ARCHIVO
-// ============================================================
-const dropZone = document.getElementById('dropZone');
-document.getElementById('fi').addEventListener('change', e => { if(e.target.files[0]) cargarArchivo(e.target.files[0]); });
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag');
-  if(e.dataTransfer.files[0]) cargarArchivo(e.dataTransfer.files[0]);
-});
-
-function cargarArchivo(file) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const wb = XLSX.read(ev.target.result, { type:'binary', cellDates:true, raw:false });
-
-      // Buscar hoja "Reporte de Asistencia" (case-insensitive)
-      let sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('reporte') || n.toLowerCase().includes('asistencia'));
-      let sheetMsg = '';
-      if (sheetName) {
-        sheetMsg = `hoja "${sheetName}"`;
-      } else {
-        sheetName = wb.SheetNames[0];
-        sheetMsg = `primera hoja "${sheetName}" (no se encontró "Reporte de Asistencia")`;
+function loadFile(file){
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'binary',cellDates:true,raw:false});
+      // Buscar hoja correcta
+      let sh=wb.SheetNames.find(n=>n.toLowerCase().includes('reporte')||n.toLowerCase().includes('asistencia'));
+      let msg='', tipo='ok';
+      if(sh){
+        msg=`Hoja: "${sh}"`;
+      }else{
+        sh=wb.SheetNames[0];
+        tipo='wn';
+        msg=`⚠️ No encontré "Reporte de Asistencia". Usando: "${sh}". Disponibles: ${wb.SheetNames.join(', ')}`;
       }
-
-      const ws = wb.Sheets[sheetName];
-      rawData = XLSX.utils.sheet_to_json(ws, { raw:false, defval:'' });
-
-      if (!rawData || rawData.length === 0) {
-        setStatus('err', `❌ La hoja "${sheetName}" está vacía o no tiene datos.`);
-        return;
-      }
-
-      detectarNuevos(rawData);
-
-      const tipo = sheetName.toLowerCase().includes('reporte') ? 'ok' : 'warn';
-      setStatus(tipo, `✅ ${file.name} — ${rawData.length} registros en ${sheetMsg}`);
-      dropZone.style.opacity = '.55';
-      dropZone.style.pointerEvents = 'none';
-    } catch(err) {
-      setStatus('err', `❌ Error al leer el archivo: ${err.message}`);
-    }
+      const ws=wb.Sheets[sh];
+      rawData=XLSX.utils.sheet_to_json(ws,{raw:false,defval:''});
+      if(!rawData||!rawData.length){setSt('er','❌ La hoja "'+sh+'" está vacía.');return;}
+      setSt(tipo,`✅ ${file.name} — ${rawData.length} registros. ${msg}`);
+      dz.style.opacity='.5'; dz.style.pointerEvents='none';
+      showMap(rawData);
+    }catch(e){setSt('er','❌ Error: '+e.message);}
   };
-  reader.readAsBinaryString(file);
+  r.readAsBinaryString(file);
 }
 
-function setStatus(type, msg) {
-  const el = document.getElementById('fileStatus');
-  el.className = `status ${type}`;
-  el.textContent = msg;
-  el.classList.remove('hidden');
+function setSt(t,m){const el=document.getElementById('fst');el.className='st '+t;el.textContent=m;el.classList.remove('hid');}
+
+function getIdCol(){return document.getElementById('cId')?.value||'';}
+function getFechaCol(){return document.getElementById('cFecha')?.value||'';}
+function getHoraCol(){return document.getElementById('cHora')?.value||'';}
+
+function showMap(data){
+  const keys=Object.keys(data[0]);
+  // Auto-detect
+  const aId   = keys.find(k=>/enroll|userid|user.id|no\b|legajo/i.test(k)) || keys[0];
+  const aFecha= keys.find(k=>/date|fecha/i.test(k)&&!/time|hora/i.test(k)) || keys.find(k=>/date|fecha/i.test(k));
+  const aHora = keys.find(k=>/time|hora/i.test(k)&&!/date|fecha/i.test(k)) || keys.find(k=>/time|hora/i.test(k));
+
+  const opts='<option value="">— ninguna —</option>'+keys.map(k=>`<option value="${k}">${k}</option>`).join('');
+  ['cId','cFecha','cHora'].forEach(id=>{document.getElementById(id).innerHTML=opts;});
+  document.getElementById('cId').value   = aId    ||'';
+  document.getElementById('cFecha').value= aFecha ||'';
+  document.getElementById('cHora').value = aHora  ||'';
+
+  // Preview table (5 rows)
+  const prev=data.slice(0,5);
+  let h=`<table><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>`;
+  prev.forEach(row=>{h+=`<tr>${keys.map(k=>`<td style="white-space:nowrap">${row[k]??''}</td>`).join('')}</tr>`;});
+  h+='</tbody></table>';
+  document.getElementById('rawPrev').innerHTML=h;
+  document.getElementById('mapCard').classList.remove('hid');
+
+  // Re-detect employees when columns change
+  ['cId','cFecha','cHora'].forEach(id=>document.getElementById(id).addEventListener('change',()=>detectNew(rawData)));
+  detectNew(rawData);
 }
 
-function detectarNuevos(data) {
-  if (!data || !data.length) return;
-  const keys = Object.keys(data[0]);
-  const idCol  = keys.find(k => /enroll|userid|user.?id|id.?no|no\b|legajo/i.test(k)) || keys[0];
-  const nameCol = keys.find(k => /name|nombre/i.test(k));
-  const conocidos = new Set(EMPLEADOS.map(e => e.id));
-  const nuevos = new Set();
-  data.forEach(row => {
-    const id = parseInt(String(row[idCol]||'').trim());
-    if (!id || isNaN(id) || EXCLUIDOS_FIJOS.has(id) || conocidos.has(id) || nuevos.has(id)) return;
-    nuevos.add(id);
-    const nombre = nameCol ? String(row[nameCol]||'').trim() : `ID ${id}`;
-    EMPLEADOS.push({ id, nombre: nombre||`ID ${id}`, excl: true });
+function detectNew(data){
+  if(!data||!data.length) return;
+  const idc=getIdCol()||Object.keys(data[0])[0];
+  const nc=Object.keys(data[0]).find(k=>/name|nombre/i.test(k));
+  const known=new Set(EMPS.map(e=>e.id));
+  const nuevo=new Set();
+  data.forEach(row=>{
+    const id=parseInt(String(row[idc]||'').trim());
+    if(!id||isNaN(id)||EXCL_FIJOS.has(id)||known.has(id)||nuevo.has(id)) return;
+    nuevo.add(id);
+    const nm=nc?String(row[nc]||'').trim():`ID ${id}`;
+    EMPS.push({id,n:nm||`ID ${id}`,excl:true});
   });
-  if (nuevos.size > 0) renderEmpEditor();
+  if(nuevo.size) renderEmps();
 }
 
-// ============================================================
-// PASO 2 — SEMANAS
-// ============================================================
-function getDiasQ(m, y, q) {
-  const n = new Date(y, m, 0).getDate();
-  const result = [];
-  const from = q === 1 ? 1 : 16;
-  const to   = q === 1 ? 15 : n;
-  for (let d = from; d <= to; d++) {
-    const dt = new Date(y, m-1, d);
-    result.push({ d, dateStr:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, dow:dt.getDay() });
+// --- PASO 2 ---
+function getDiasQ(m,y,q){
+  const tot=new Date(y,m,0).getDate();
+  const f=q===1?1:16, t=q===1?15:tot;
+  const dias=[];
+  for(let d=f;d<=t;d++){
+    const dt=new Date(y,m-1,d);
+    dias.push({d,ds:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,dow:dt.getDay()});
   }
-  return result;
+  return dias;
 }
 
-function calcSemanas(dias) {
-  const weeks = [];
-  let cur = null;
-  dias.forEach(dia => {
-    const wd = dia.dow === 0 ? 7 : dia.dow;
-    if (wd === 1 || !cur) { if(cur) weeks.push(cur); cur={dias:[]}; }
-    cur.dias.push(dia);
-  });
-  if (cur && cur.dias.length) weeks.push(cur);
-  weeks.forEach((w,i) => { w.idx=i; });
-  return weeks;
+function calcSems(dias){
+  const ws=[];let cur=null;
+  dias.forEach(d=>{const wd=d.dow===0?7:d.dow;if(wd===1||!cur){if(cur)ws.push(cur);cur={dias:[]};}cur.dias.push(d);});
+  if(cur&&cur.dias.length)ws.push(cur);
+  ws.forEach((w,i)=>w.idx=i);
+  return ws;
 }
 
-function goStep2() {
-  if (!rawData) { alert('⚠️ Primero cargá el archivo del reloj.'); return; }
-  mes  = parseInt(document.getElementById('selMes').value);
-  anio = parseInt(document.getElementById('inpAnio').value);
-  const diasQ = getDiasQ(mes, anio, quincena);
-  semanas = calcSemanas(diasQ);
-  tnPorSemana = {};
-  document.getElementById('pgdLabel').textContent =
-    `${quincena===1?'1°':'2°'} Quincena — ${MESES[mes]} ${anio}`;
-  const activos = EMPLEADOS.filter(e => !e.excl);
-  const container = document.getElementById('weeksContainer');
-  container.innerHTML = '';
-  semanas.forEach((sem, wi) => {
-    tnPorSemana[wi] = new Set();
-    const f = sem.dias[0], l = sem.dias[sem.dias.length-1];
-    const div = document.createElement('div');
-    div.className = 'week-block';
-    div.innerHTML = `
-      <div class="week-title">Semana ${wi+1} &nbsp;—&nbsp; días ${f.d} al ${l.d}</div>
+function irPaso2(){
+  if(!rawData){alert('⚠️ Primero cargá el archivo del reloj.');return;}
+  MES=+document.getElementById('sm').value;
+  ANIO=+document.getElementById('sa').value;
+  const dias=getDiasQ(MES,ANIO,Q);
+  SEMS=calcSems(dias); TN={};
+  document.getElementById('p2lbl').textContent=`${Q===1?'1°':'2°'} Quincena — ${MN[MES]} ${ANIO}`;
+  const act=EMPS.filter(e=>!e.excl);
+  const c=document.getElementById('semCont'); c.innerHTML='';
+  SEMS.forEach((s,wi)=>{
+    TN[wi]=new Set();
+    const f=s.dias[0],l=s.dias[s.dias.length-1];
+    const d=document.createElement('div'); d.className='wb';
+    d.innerHTML=`<div class="wt">Semana ${wi+1} — días ${f.d} al ${l.d}</div>
       <div class="chips">
-        ${activos.map(e => `<div class="chip" data-wi="${wi}" data-id="${e.id}" onclick="toggleTN(${wi},${e.id},this)">${e.nombre}</div>`).join('')}
-        <div class="chip chip-reset" onclick="resetSemana(${wi})">↺ Limpiar</div>
+        ${act.map(e=>`<div class="chip" data-wi="${wi}" data-id="${e.id}" onclick="togTN(${wi},${e.id},this)">${e.n}</div>`).join('')}
+        <div class="chip cr" onclick="clrSem(${wi})">↺ Limpiar</div>
       </div>`;
-    container.appendChild(div);
+    c.appendChild(d);
   });
-  goStep(2);
+  ir(2);
 }
 
-function toggleTN(wi, id, el) {
-  const n = Number(id);
-  tnPorSemana[wi].has(n) ? (tnPorSemana[wi].delete(n), el.classList.remove('on')) : (tnPorSemana[wi].add(n), el.classList.add('on'));
-}
-function resetSemana(wi) {
-  tnPorSemana[wi].clear();
-  document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c => c.classList.remove('on'));
-}
+function togTN(wi,id,el){const n=Number(id);TN[wi].has(n)?(TN[wi].delete(n),el.classList.remove('on')):(TN[wi].add(n),el.classList.add('on'));}
+function clrSem(wi){TN[wi].clear();document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c=>c.classList.remove('on'));}
 
-// ============================================================
-// PARSEO DE REGISTROS DEL RELOJ
-// ============================================================
-function parsearRegistros() {
-  if (!rawData || !rawData.length) return {};
-  const keys = Object.keys(rawData[0]);
-  const idCol   = keys.find(k => /enroll|userid|user.?id|id.?no|^\s*no\s*$/i.test(k)) || keys[0];
-  const nameCol  = keys.find(k => /name|nombre/i.test(k));
-  const dtCol   = keys.find(k => /datetime|date.*time/i.test(k));
-  const dateCol  = keys.find(k => /\bdate\b|\bfecha\b/i.test(k) && !/time/i.test(k));
-  const timeCol  = keys.find(k => /\btime\b|\bhora\b/i.test(k) && !/date/i.test(k));
-  const byEmp = {};
+function getWidx(ds){for(let i=0;i<SEMS.length;i++)if(SEMS[i].dias.some(d=>d.ds===ds))return i;return -1;}
 
-  rawData.forEach(row => {
-    const id = parseInt(String(row[idCol]||'').trim());
-    if (!id || isNaN(id) || EXCLUIDOS_FIJOS.has(id)) return;
-    const ecfg = EMPLEADOS.find(e => e.id === id);
-    if (!ecfg || ecfg.excl) return;
+// --- PARSEO ---
+function parseRegs(){
+  if(!rawData||!rawData.length) return {};
+  const keys=Object.keys(rawData[0]);
+  const idc  = getIdCol()  || keys.find(k=>/enroll|userid|no\b|legajo/i.test(k)) || keys[0];
+  const fc   = getFechaCol()|| keys.find(k=>/date|fecha/i.test(k));
+  const hc   = getHoraCol() || keys.find(k=>/time|hora/i.test(k));
+  const nc   = keys.find(k=>/name|nombre/i.test(k));
 
-    let dt = null;
-    if (dtCol && row[dtCol]) dt = new Date(String(row[dtCol]).trim());
-    else if (dateCol && row[dateCol]) {
-      const ds = String(row[dateCol]).trim();
-      const ts = timeCol ? String(row[timeCol]||'00:00').trim() : '00:00';
-      dt = new Date(`${ds} ${ts}`);
+  const byE={};
+  rawData.forEach(row=>{
+    const id=parseInt(String(row[idc]||'').trim());
+    if(!id||isNaN(id)||EXCL_FIJOS.has(id)) return;
+    const ecfg=EMPS.find(e=>e.id===id);
+    if(!ecfg||ecfg.excl) return;
+
+    // Parsear fecha y hora
+    let dt=null;
+    const fStr=fc?String(row[fc]||'').trim():'';
+    const hStr=hc?String(row[hc]||'').trim():'';
+
+    if(fStr&&hStr){
+      // "DD/MM/YYYY" o "YYYY-MM-DD" + "HH:MM"
+      const fClean=fStr.replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$3-$2-$1').replace(/\//g,'-');
+      dt=new Date(`${fClean}T${hStr.substring(0,5)}`);
+    }else if(fStr){
+      // datetime en una columna: "DD/MM/YYYY HH:MM"
+      const m=fStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/);
+      if(m) dt=new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}`);
+      else dt=new Date(fStr);
     }
-    if (!dt || isNaN(dt.getTime())) return;
+    if(!dt||isNaN(dt.getTime())) return;
 
-    const dateKey = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-    const hora = dt.getHours() + dt.getMinutes()/60;
-
-    if (!byEmp[id]) byEmp[id] = { id, nombre: ecfg.nombre, registros:[] };
-    byEmp[id].registros.push({ dateKey, hora, dt });
+    const ds=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    const h=dt.getHours()+dt.getMinutes()/60;
+    if(!byE[id]) byE[id]={id,n:ecfg.n,regs:[]};
+    byE[id].regs.push({ds,h,dt});
   });
 
-  // Armar turnos (con manejo de TN cruzando medianoche)
-  Object.values(byEmp).forEach(emp => {
-    emp.registros.sort((a,b) => a.dt-b.dt);
-    emp.turnos = {};
-    const regs = emp.registros;
-    let i = 0;
-    while (i < regs.length) {
-      const r = regs[i];
-      const enMes = r.dt.getMonth()+1 === mes && r.dt.getFullYear() === anio;
-      if (!enMes) { i++; continue; }
-      const wi = getWeekIdx(r.dateKey);
-      const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(emp.id);
-
-      if (esTN && r.hora >= 18) {
-        const next = regs[i+1];
-        if (next && next.hora <= 12 && (next.dt - r.dt) < 14*3600000) {
-          emp.turnos[r.dateKey] = { entrada:r.hora, salida:next.hora+24, esTN:true };
-          i += 2;
-        } else {
-          emp.turnos[r.dateKey] = { entrada:r.hora, salida:null, esTN:true };
-          i++;
-        }
-      } else if (esTN && r.hora <= 10) {
-        i++; // salida del turno noche anterior, ya contada
-      } else {
-        const entrada = r.hora;
-        const next = regs[i+1];
-        let salida = null;
-        if (next && next.dateKey === r.dateKey && next.hora > entrada) { salida=next.hora; i+=2; }
-        else if (next && next.hora < entrada && (next.dt-r.dt) < 14*3600000) { salida=next.hora+24; i+=2; }
-        else { i++; }
-        if (!emp.turnos[r.dateKey]) emp.turnos[r.dateKey] = { entrada, salida, esTN:false };
+  // Armar turnos
+  Object.values(byE).forEach(emp=>{
+    emp.regs.sort((a,b)=>a.dt-b.dt);
+    emp.t={};
+    const rr=emp.regs; let i=0;
+    while(i<rr.length){
+      const r=rr[i];
+      const inM=r.dt.getMonth()+1===MES&&r.dt.getFullYear()===ANIO;
+      if(!inM){i++;continue;}
+      const wi=getWidx(r.ds);
+      const tn=wi>=0&&TN[wi]&&TN[wi].has(emp.id);
+      if(tn&&r.h>=18){
+        const nx=rr[i+1];
+        if(nx&&nx.h<=12&&(nx.dt-r.dt)<14*3600000){emp.t[r.ds]={e:r.h,s:nx.h+24,tn:true};i+=2;}
+        else{emp.t[r.ds]={e:r.h,s:null,tn:true};i++;}
+      }else if(tn&&r.h<=10){
+        i++;
+      }else{
+        const nx=rr[i+1]; let sal=null;
+        if(nx&&nx.ds===r.ds&&nx.h>r.h){sal=nx.h;i+=2;}
+        else if(nx&&nx.h<r.h&&(nx.dt-r.dt)<14*3600000){sal=nx.h+24;i+=2;}
+        else i++;
+        if(!emp.t[r.ds]) emp.t[r.ds]={e:r.h,s:sal,tn:false};
       }
     }
   });
-  return byEmp;
+  return byE;
 }
 
-function getWeekIdx(dateStr) {
-  for (let i = 0; i < semanas.length; i++) {
-    if (semanas[i].dias.some(d => d.dateStr === dateStr)) return i;
-  }
-  return -1;
+function fmtH(h){if(h===null||h===undefined)return '--:--';const hh=Math.floor(h%24),mm=Math.round((h%1)*60);return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;}
+
+function calcH(t,tn){
+  if(!t||t.s===null) return {b:0,x:0,tot:0};
+  const w=Math.floor(t.s-t.e); if(w<=0||w>20) return {b:0,x:0,tot:0};
+  const base=tn?10:9;
+  const x=Math.round(Math.max(0,w-base)*1.5*10)/10;
+  return {b:base,x,tot:base+x};
 }
 
-function fmtH(h) {
-  if (h===null||h===undefined) return '--:--';
-  const hh = Math.floor(h%24), mm = Math.round((h%1)*60);
-  return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+// --- EXCEL ---
+function genExcel(){
+  const empD=parseRegs();
+  const dias=getDiasQ(MES,ANIO,Q);
+  const ql=Q===1?'1Q':'2Q';
+  const titulo=`${MN[MES]} ${ANIO} — ${Q===1?'1° Quincena':'2° Quincena'}`;
+  const fn=`Asistencia_${MN[MES]}_${ANIO}_${ql}.xlsx`;
+
+  const wb=XLSX.utils.book_new();
+  const aoa=buildAOA(empD,dias,titulo);
+  const ws=XLSX.utils.aoa_to_sheet(aoa);
+
+  // Ancho de columnas
+  const wscols=[{wch:2},{wch:26},...dias.map(()=>({wch:9})),{wch:8}];
+  ws['!cols']=wscols;
+
+  XLSX.utils.book_append_sheet(wb,ws,Q===1?'1° Quincena':'2° Quincena');
+  XLSX.writeFile(wb,fn);
+
+  lastFN=fn;
+  document.getElementById('btnDL').onclick=()=>XLSX.writeFile(wb,fn);
+  document.getElementById('xlInfo').textContent=`${titulo} — ${EMPS.filter(e=>!e.excl).length} empleados`;
+  renderPrev(empD,dias);
+  ir(3);
 }
 
-function calcHoras(turno) {
-  if (!turno || turno.salida===null) return { base:0, extra:0, total:0 };
-  const worked = Math.floor(turno.salida - turno.entrada);
-  if (worked<=0||worked>20) return { base:0, extra:0, total:0 };
-  const base = turno.esTN ? 10 : 9;
-  const extra15 = Math.round(Math.max(0, worked-base)*1.5*10)/10;
-  return { base, extra:extra15, total:base+extra15 };
-}
+function buildAOA(empD,dias,titulo){
+  const DOW=['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+  const rows=[[titulo],['Empleado',...dias.map(d=>d.d),'TOTAL'],['', ...dias.map(d=>DOW[d.dow]),'']];
 
-// ============================================================
-// GENERAR EXCEL CON FORMATO COMPLETO (ExcelJS)
-// ============================================================
-async function generarExcel() {
-  const btn = document.getElementById('btnGenerar');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Generando...';
+  EMPS.filter(e=>!e.excl).forEach(ecfg=>{
+    const emp=empD[ecfg.id];
+    const rN=[ecfg.n]; const rT=['Turno']; const rH=['Horario'];
+    const rB=['Hs Base']; const rX=['Hs Extra x1.5']; const rTo=['TOTAL'];
+    let sumX=0,sumTot=0,sumB=0;
 
-  try {
-    const empData = parsearRegistros();
-    const diasQ   = getDiasQ(mes, anio, quincena);
-    const qLabel  = quincena===1 ? '1° Quincena' : '2° Quincena';
-    const titulo  = `${MESES[mes]} ${anio} — ${qLabel}`;
+    dias.forEach(dia=>{
+      const wi=getWidx(dia.ds);
+      const tn=wi>=0&&TN[wi]&&TN[wi].has(ecfg.id);
+      const turno=emp?(emp.t[dia.ds]||null):null;
+      const fer=FERIAS.has(dia.ds);
+      const we=dia.dow===0||dia.dow===6;
+      rT.push(tn?'TN':'TM');
 
-    const wb = new ExcelJS.Workbook();
-    wb.creator = 'Winflex';
-    wb.created = new Date();
-    const ws = wb.addWorksheet(qLabel);
-
-    // --- Columnas ---
-    // Col 1 = A (spacer), Col 2 = B (labels), Col 3.. = días, últimacol = TOT
-    const totColIdx = 2 + diasQ.length + 1; // índice basado en 1
-    ws.getColumn(1).width = 2;
-    ws.getColumn(2).width = 22;
-    for (let i = 0; i < diasQ.length; i++) ws.getColumn(3+i).width = 7;
-    ws.getColumn(totColIdx).width = 8;
-
-    // Helper fill sólido
-    const sf = hex => ({ type:'pattern', pattern:'solid', fgColor:{ argb: hex } });
-    const baseFont = { name:'Calibri', size:10 };
-    const boldFont = { name:'Calibri', size:10, bold:true };
-    const cen = { horizontal:'center', vertical:'middle' };
-    const cenWrap = { horizontal:'center', vertical:'middle', wrapText:false };
-
-    // --- Fila 1: Números de día ---
-    const r1 = ws.getRow(1);
-    r1.height = 18;
-    diasQ.forEach((dia, i) => {
-      const col = 3+i;
-      const isWE = dia.dow===0||dia.dow===6;
-      const isFer = FERIADOS.has(dia.dateStr);
-      const clr = isFer ? CLR.headerFer : isWE ? CLR.headerWE : CLR.headerDia;
-      const txtClr = (isFer||isWE) ? 'FF000000' : 'FFFFFFFF';
-      const c = ws.getCell(1, col);
-      c.value = dia.d;
-      c.fill = sf(clr); c.font = {...boldFont, color:{argb:txtClr}};
-      c.alignment = cen;
-    });
-    const cTot1 = ws.getCell(1, totColIdx);
-    cTot1.value='TOT'; cTot1.fill=sf(CLR.headerTot); cTot1.font=boldFont; cTot1.alignment=cen;
-
-    // --- Fila 2: Nombres de día ---
-    const r2 = ws.getRow(2);
-    r2.height = 16;
-    diasQ.forEach((dia, i) => {
-      const col = 3+i;
-      const isWE = dia.dow===0||dia.dow===6;
-      const isFer = FERIADOS.has(dia.dateStr);
-      const clr = isFer ? CLR.headerFer : isWE ? CLR.headerWE : CLR.headerDia;
-      const txtClr = (isFer||isWE) ? 'FF000000' : 'FFFFFFFF';
-      const c = ws.getCell(2, col);
-      c.value = DOW_NOM[dia.dow];
-      c.fill = sf(clr); c.font = {...boldFont, color:{argb:txtClr}};
-      c.alignment = cen;
-    });
-    const cTot2 = ws.getCell(2, totColIdx);
-    cTot2.value='hs'; cTot2.fill=sf(CLR.headerTot); cTot2.font=boldFont; cTot2.alignment=cen;
-
-    // --- Bloques de empleados ---
-    let curRow = 3;
-    const activos = EMPLEADOS.filter(e => !e.excl);
-
-    activos.forEach(ecfg => {
-      const emp = empData[ecfg.id];
-      const rN = curRow;     // Nombre
-      const rT = curRow+1;   // Turno
-      const rH = curRow+2;   // Horario
-      const rB = curRow+3;   // Horas base
-      const rE = curRow+4;   // Horas extra
-      const rX = curRow+5;   // Horas totales
-
-      // --- Fila Nombre (merge B:TOT) ---
-      ws.getRow(rN).height = 18;
-      const cName = ws.getCell(rN, 2);
-      cName.value = ecfg.nombre.toUpperCase();
-      cName.fill = sf(CLR.nameGreen);
-      cName.font = {...boldFont, color:{argb:'FFFFFFFF'}};
-      cName.alignment = { horizontal:'center', vertical:'middle' };
-      ws.mergeCells(rN, 2, rN, totColIdx);
-
-      // --- Etiquetas fila B ---
-      const setLabel = (row, txt, fillHex, bold=false) => {
-        const c = ws.getCell(row, 2);
-        c.value = txt;
-        if (fillHex) c.fill = sf(fillHex);
-        c.font = bold ? boldFont : baseFont;
-        c.alignment = { vertical:'middle' };
-      };
-      setLabel(rT, 'Turno',             CLR.turnoDia);
-      setLabel(rH, 'Entrada / Salida',  null);
-      setLabel(rB, 'Horas base (9h)',   CLR.baseDia);
-      setLabel(rE, 'Horas extra (x1.5)',CLR.extra);
-      setLabel(rX, 'Horas totales',     CLR.totalDia, true);
-
-      // --- Columna TOT (sólo extra) pre-declarada ---
-      let sumExtra = 0;
-
-      // --- Días ---
-      diasQ.forEach((dia, i) => {
-        const col = 3+i;
-        const isWE = dia.dow===0||dia.dow===6;
-        const isFer = FERIADOS.has(dia.dateStr);
-        const wi = getWeekIdx(dia.dateStr);
-        const esTN = wi>=0 && tnPorSemana[wi] && tnPorSemana[wi].has(ecfg.id);
-        const turno = emp ? (emp.turnos[dia.dateStr]||null) : null;
-
-        const dayFill    = isFer ? CLR.feriado : isWE ? CLR.turnoWE  : CLR.turnoDia;
-        const baseFill   = isFer ? CLR.feriado : isWE ? CLR.baseWE   : CLR.baseDia;
-        const extraFill  = isFer ? CLR.feriado : isWE ? CLR.extraWE  : CLR.extra;
-        const totalFill  = isFer ? CLR.feriado : isWE ? CLR.totalWE  : CLR.totalDia;
-
-        // TURNO
-        const cTur = ws.getCell(rT, col);
-        cTur.value = esTN ? 'TN' : 'TM';
-        cTur.fill = sf(dayFill); cTur.font = baseFont; cTur.alignment = cen;
-
-        // HORARIO
-        const cHor = ws.getCell(rH, col);
-        cHor.alignment = cenWrap; cHor.font = baseFont;
-        if (isFer && !turno) {
-          cHor.value = 'F'; cHor.fill = sf(CLR.feriado); cHor.alignment = cen;
-        } else if (isWE && !turno) {
-          cHor.fill = sf(CLR.turnoWE);
-        } else if (turno && turno.salida!==null) {
-          cHor.value = fmtH(turno.entrada)+fmtH(turno.salida%24);
-          cHor.fill = sf(CLR.blanco);
-        } else if (turno) {
-          cHor.value = fmtH(turno.entrada);
-          cHor.fill = sf(CLR.sinSalida); cHor.font = {...baseFont, bold:true};
-        } else {
-          cHor.fill = isWE ? sf(CLR.turnoWE) : sf(CLR.blanco);
-        }
-
-        // CALCULAR HORAS
-        let baseVal='', extVal='', totVal='';
-        if (isFer && !turno) {
-          baseVal=8; extVal='-'; totVal=8;
-        } else if ((isWE||isFer) && turno && turno.salida!==null) {
-          const worked = Math.floor(turno.salida-turno.entrada);
-          baseVal='-'; extVal='-'; totVal=Math.max(0,worked)*2;
-        } else if (turno && turno.salida!==null) {
-          const h = calcHoras({...turno, esTN});
-          baseVal=h.base; extVal=h.extra||'-'; totVal=h.total;
-          sumExtra += h.extra;
-        } else {
-          baseVal=''; extVal=''; totVal='';
-        }
-
-        // BASE
-        const cB = ws.getCell(rB, col);
-        cB.value=baseVal; cB.fill=sf(baseFill); cB.font=baseFont; cB.alignment=cen;
-
-        // EXTRA
-        const cE = ws.getCell(rE, col);
-        cE.value=extVal; cE.fill=sf(extraFill); cE.font=baseFont; cE.alignment=cen;
-
-        // TOTAL
-        const cX = ws.getCell(rX, col);
-        cX.value=totVal; cX.fill=sf(totalFill); cX.font=boldFont; cX.alignment=cen;
-      });
-
-      // TOT extra
-      const cTotE = ws.getCell(rE, totColIdx);
-      cTotE.value = Math.round(sumExtra*10)/10 || '-';
-      cTotE.fill = sf(CLR.headerTot); cTotE.font = boldFont; cTotE.alignment = cen;
-
-      curRow += 7; // 6 filas + 1 vacía
+      if(fer&&!turno){
+        rH.push('Feriado'); rB.push(8); rX.push('-'); rTo.push(8);
+        sumB+=8; sumTot+=8;
+      }else if((we||fer)&&turno&&turno.s!==null){
+        const w=Math.floor(turno.s-turno.e); const hs=Math.max(0,w)*2;
+        rH.push(`${fmtH(turno.e)}-${fmtH(turno.s%24)}`);
+        rB.push('-'); rX.push('-'); rTo.push(hs); sumTot+=hs;
+      }else if(turno&&turno.s!==null){
+        const h=calcH(turno,tn);
+        rH.push(`${fmtH(turno.e)}-${fmtH(turno.s%24)}`);
+        rB.push(h.b); rX.push(h.x||'-'); rTo.push(h.tot);
+        sumB+=h.b; sumX+=h.x; sumTot+=h.tot;
+      }else if(turno){
+        rH.push(`${fmtH(turno.e)} (s/s)`); rB.push('-'); rX.push('-'); rTo.push('-');
+      }else{
+        rH.push(''); rB.push(''); rX.push(''); rTo.push('');
+      }
     });
 
-    // --- Descargar ---
-    const buffer = await wb.xlsx.writeBuffer();
-    lastBuffer = buffer;
-    lastFilename = `Asistencia_${MESES[mes]}_${anio}_Q${quincena}.xlsx`;
-
-    descargar(buffer, lastFilename);
-    document.getElementById('btnDL').onclick = () => descargar(lastBuffer, lastFilename);
-    document.getElementById('excelInfo').textContent = `${titulo} — ${activos.length} empleados`;
-    renderPreview(empData, diasQ);
-    goStep(3);
-
-  } catch(err) {
-    alert('Error generando Excel: ' + err.message);
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '⚡ Generar Excel';
-  }
-}
-
-function descargar(buffer, filename) {
-  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download=filename; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
-}
-
-// ============================================================
-// PREVIEW WEB
-// ============================================================
-function renderPreview(empData, dias) {
-  const activos = EMPLEADOS.filter(e=>!e.excl);
-  let html = `<table><thead><tr>
-    <th>Empleado</th><th>Leg.</th>
-    <th class="num">Días</th><th class="num">Hs. Base</th>
-    <th class="num">Hs. Extra</th><th class="num">Total Hs.</th><th>Turno</th>
-  </tr></thead><tbody>`;
-  let totalG=0;
-  activos.forEach(ecfg => {
-    const emp = empData[ecfg.id];
-    let diasT=0, hsBase=0, hsExt=0, hsTot=0, tieneTN=false;
-    dias.forEach(dia => {
-      const wi=getWeekIdx(dia.dateStr);
-      const esTN=wi>=0&&tnPorSemana[wi]&&tnPorSemana[wi].has(ecfg.id);
-      if(esTN) tieneTN=true;
-      if(FERIADOS.has(dia.dateStr) && !(emp&&emp.turnos[dia.dateStr])) { hsTot+=8; hsBase+=8; return; }
-      if(!emp) return;
-      const t=emp.turnos[dia.dateStr];
-      if(t&&t.salida!==null){ diasT++; const h=calcHoras({...t,esTN}); hsBase+=h.base; hsExt+=h.extra; hsTot+=h.total; }
-    });
-    totalG+=hsTot;
-    html+=`<tr>
-      <td class="fw7">${ecfg.nombre}</td>
-      <td style="color:var(--text-muted);font-size:12px">${ecfg.id}</td>
-      <td class="num">${diasT}</td>
-      <td class="num">${hsBase}</td>
-      <td class="num">${Math.round(hsExt*10)/10}</td>
-      <td class="num fw7">${Math.round(hsTot*10)/10}</td>
-      <td><span class="badge ${tieneTN?'badge-tn':'badge-tm'}">${tieneTN?'TN':'TM'}</span></td>
-    </tr>`;
+    rN.push(...Array(dias.length).fill(''));
+    rB.push(sumB); rX.push(Math.round(sumX*10)/10||'-'); rTo.push(Math.round(sumTot*10)/10);
+    rows.push(rN,rT,rH,rB,rX,rTo,[]);
   });
-  html+=`</tbody><tfoot><tr>
-    <td colspan="5">TOTAL PLANTEL</td>
-    <td class="num">${Math.round(totalG*10)/10}</td><td></td>
-  </tr></tfoot></table>`;
-  document.getElementById('previewTbl').innerHTML=html;
+  return rows;
+}
+
+function renderPrev(empD,dias){
+  const act=EMPS.filter(e=>!e.excl);
+  let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">Hs Base</th><th class="nr">Hs Extra</th><th class="nr">Total</th><th>Turno</th></tr></thead><tbody>`;
+  let tot=0;
+  act.forEach(ecfg=>{
+    const emp=empD[ecfg.id];
+    let d=0,b=0,x=0,t=0,hasTN=false;
+    dias.forEach(dia=>{
+      const wi=getWidx(dia.ds);
+      const tn=wi>=0&&TN[wi]&&TN[wi].has(ecfg.id);
+      if(tn)hasTN=true;
+      if(FERIAS.has(dia.ds)&&!(emp&&emp.t[dia.ds])){t+=8;b+=8;return;}
+      if(!emp)return;
+      const tr=emp.t[dia.ds];
+      if(tr&&tr.s!==null){d++;const h2=calcH(tr,tn);b+=h2.b;x+=h2.x;t+=h2.tot;}
+    });
+    tot+=t;
+    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.id}</td><td class="nr">${d}</td><td class="nr">${b}</td><td class="nr">${Math.round(x*10)/10}</td><td class="nr fw">${Math.round(t*10)/10}</td><td><span class="bx ${hasTN?'btn2':'btm'}">${hasTN?'TN':'TM'}</span></td></tr>`;
+  });
+  h+=`</tbody><tfoot><tr><td colspan="5">TOTAL PLANTEL</td><td class="nr">${Math.round(tot*10)/10}</td><td></td></tr></tfoot></table>`;
+  document.getElementById('prevTbl').innerHTML=h;
 }
 </script>
 </body>
