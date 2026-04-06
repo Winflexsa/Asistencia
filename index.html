@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-:root{--bg:#f0f2f5;--sur:#fff;--c2:#f8f9fb;--brd:#dde1e7;--acc:#1a56e8;--al:#edf2fe;--grn:#0e7a3c;--gl:#edfaf2;--org:#c4620a;--ol:#fff4e8;--red:#c8291e;--rl:#fef2f1;--txt:#1a1f36;--dim:#5a6072;--mut:#9aa0b0;--vac:#d9f0d0}
+:root{--bg:#f0f2f5;--sur:#fff;--c2:#f8f9fb;--brd:#dde1e7;--acc:#1a56e8;--al:#edf2fe;--grn:#0e7a3c;--gl:#edfaf2;--org:#c4620a;--ol:#fff4e8;--red:#c8291e;--rl:#fef2f1;--txt:#1a1f36;--dim:#5a6072;--mut:#9aa0b0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
 .hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:0 28px;display:flex;align-items:center;height:54px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
@@ -46,6 +46,7 @@ select:focus,input:focus{border-color:var(--acc)}
 .ni{flex:1;background:var(--c2);border:1px solid var(--brd);border-radius:6px;padding:6px 10px;color:var(--txt);font-size:13px;outline:none}
 .xb{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--brd);background:transparent;color:var(--dim);cursor:pointer}
 .xb.on{border-color:var(--red);color:var(--red);background:var(--rl)}
+/* TN semanas */
 .wl{display:flex;flex-direction:column;gap:10px}
 .wb{background:var(--c2);border:1.5px solid var(--brd);border-radius:9px;padding:14px 16px}
 .wt{font-size:11px;font-weight:700;color:var(--dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
@@ -54,12 +55,20 @@ select:focus,input:focus{border-color:var(--acc)}
 .chip:hover{border-color:var(--org);color:var(--org)}
 .chip.on{border-color:var(--org);background:var(--ol);color:var(--org);font-weight:600}
 .cr{border-style:dashed;font-size:11px}
-.vac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:4px}
-.vac-item{background:var(--c2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px}
-.vac-nom{flex:1;font-size:13px;font-weight:500}
-.vac-inp{width:56px;padding:6px 8px;border:1.5px solid var(--brd);border-radius:6px;font-size:14px;font-weight:700;text-align:center;color:var(--grn);background:var(--sur);outline:none}
-.vac-inp:focus{border-color:var(--grn)}
-.vac-lbl{font-size:11px;color:var(--dim)}
+/* Selector de días V/E */
+.vac-table{display:flex;flex-direction:column;gap:8px}
+.vac-emp-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--c2);border:1px solid var(--brd);border-radius:8px;flex-wrap:wrap}
+.vac-emp-nom{font-size:13px;font-weight:600;min-width:200px;flex-shrink:0}
+.vac-days{display:flex;flex-wrap:wrap;gap:4px;flex:1}
+.vac-legend{display:flex;gap:16px;margin-bottom:10px;font-size:12px;color:var(--dim);align-items:center}
+.leg-dot{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.day-btn{width:28px;height:28px;border-radius:5px;border:1.5px solid var(--brd);background:var(--sur);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dim);transition:.12s;user-select:none;position:relative}
+.day-btn:hover{border-color:var(--acc)}
+.day-btn.we{background:#f8f0f0;border-color:#e8cece;color:#b08080}
+.day-btn.vac{background:#d4f0da;border-color:#4caf50;color:#1b6b2a;font-weight:800}
+.day-btn.enf{background:#fff0d4;border-color:#e0a020;color:#7a5200;font-weight:800}
+.day-btn.fer{background:#fff8d0;border-color:#d4b800;color:#7a6000}
+/* Preview tabla */
 .tw{overflow-x:auto;margin-top:8px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{background:var(--c2);padding:9px 12px;text-align:left;color:var(--dim);font-weight:600;border-bottom:2px solid var(--brd);white-space:nowrap}
@@ -69,7 +78,7 @@ tbody tr:hover td{background:#f5f6f9}
 tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
 .nr{text-align:right}.fw{font-weight:700}
 .bx{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
-.btm{background:var(--al);color:var(--acc)}.bvac{background:var(--vac);color:var(--grn)}.btn2{background:var(--ol);color:var(--org)}
+.btm{background:var(--al);color:var(--acc)}.btn2{background:var(--ol);color:var(--org)}.bvac{background:#d4f0da;color:#1b6b2a}.benf{background:#fff0d4;color:#7a5200}
 .sc{text-align:center;padding:36px 20px}
 .sc .ico{font-size:52px;margin-bottom:12px}
 .sc h2{font-size:21px;font-weight:700;margin-bottom:6px}
@@ -85,13 +94,14 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
   <div class="steps">
     <div class="step on" id="s1"><div class="dot">1</div> Cargar</div>
     <div class="sep"></div>
-    <div class="step" id="s2"><div class="dot">2</div> TN + Vacaciones</div>
+    <div class="step" id="s2"><div class="dot">2</div> TN + V + E</div>
     <div class="sep"></div>
     <div class="step" id="s3"><div class="dot">3</div> Descargar</div>
   </div>
 </div>
 <div class="wrap">
 
+<!-- PASO 1 -->
 <div id="p1">
   <div class="card">
     <div class="hd">📂 Archivo del reloj (1_report.xls)</div>
@@ -132,16 +142,22 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
   <button class="btn bp blg" onclick="irP2()">Continuar →</button>
 </div>
 
+<!-- PASO 2 -->
 <div id="p2" class="hid">
   <div class="card">
     <div class="hd">🌙 Turno Noche — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
-    <p class="sm" style="margin-bottom:14px">Seleccioná quién estuvo de noche en cada semana.</p>
+    <p class="sm" style="margin-bottom:14px">Hacé clic en cada empleado que estuvo de noche esa semana.</p>
     <div class="wl" id="semCont"></div>
   </div>
   <div class="card">
-    <div class="hd">🏖️ Días de vacaciones en este período</div>
-    <p class="sm" style="margin-bottom:14px">Cada día = 8 hs. Se suma al total.</p>
-    <div class="vac-grid" id="vacGrid"></div>
+    <div class="hd">🏖️ Vacaciones y 🤒 Enfermedad</div>
+    <div class="vac-legend">
+      <span>Clic en el día para marcar:</span>
+      <span><span class="leg-dot" style="background:#d4f0da;border:1.5px solid #4caf50;color:#1b6b2a">V</span> Vacaciones (8 hs)</span>
+      <span><span class="leg-dot" style="background:#fff0d4;border:1.5px solid #e0a020;color:#7a5200">E</span> Enfermedad (8 hs)</span>
+      <span><span class="leg-dot" style="background:var(--sur);border:1.5px solid var(--brd);color:var(--dim)">·</span> Ninguno</span>
+    </div>
+    <div class="vac-table" id="vacTable"></div>
   </div>
   <div style="display:flex;gap:10px;margin-top:4px">
     <button class="btn bg" onclick="ir(1)">← Atrás</button>
@@ -149,6 +165,7 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
   </div>
 </div>
 
+<!-- PASO 3 -->
 <div id="p3" class="hid">
   <div class="card">
     <div class="sc">
@@ -164,7 +181,7 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
   <div style="margin-top:14px"><button class="btn bg" onclick="ir(1)">← Nuevo reporte</button></div>
 </div>
 
-</div>
+</div><!-- wrap -->
 <script>
 const CFG=[
   {leg:3,n:"Brest Juan Andrés"},{leg:20,n:"Luna Gabriel Ignacio"},
@@ -181,6 +198,8 @@ const DN=['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
 
 let EMPS=CFG.map(e=>({...e,excl:false}));
 let fileEmps={},Q=1,MES,ANIO,SEMS=[],TN={};
+// DIAS_VE[leg][day] = 'V' | 'E' | null
+let DIAS_VE={};
 
 const now=new Date();
 document.getElementById('sm2').value=now.getMonth()+1;
@@ -194,13 +213,13 @@ function updRng(){const m=+document.getElementById('sm2').value,y=+document.getE
 function ir(n){[1,2,3].forEach(i=>{document.getElementById('p'+i).classList.toggle('hid',i!==n);document.getElementById('s'+i).className='step'+(i===n?' on':i<n?' done':'');});window.scrollTo(0,0);}
 function renderEmps(){document.getElementById('empEd').innerHTML=EMPS.map((e,i)=>`<div class="er-row"><div class="leg">${e.leg}</div><input class="ni" type="text" value="${e.n}" onchange="EMPS[${i}].n=this.value"><button class="xb ${e.excl?'on':''}" onclick="togX(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button></div>`).join('');}
 function togX(i,b){EMPS[i].excl=!EMPS[i].excl;b.textContent=EMPS[i].excl?'✕ Excluido':'Activo';b.classList.toggle('on',EMPS[i].excl);}
+
 function norm(s){return s.toLowerCase().replace(/[áà]/g,'a').replace(/[éè]/g,'e').replace(/[íì]/g,'i').replace(/[óò]/g,'o').replace(/[úùü]/g,'u').replace(/ñ/g,'n').replace(/,/g,' ').replace(/\s+/g,' ').trim();}
 function matchLeg(fname){const fp=norm(fname).split(' ').filter(p=>p.length>2);let best=null,bs=0;EMPS.forEach(e=>{const cp=norm(e.n).split(' ').filter(p=>p.length>2);const m=fp.filter(p=>cp.includes(p)).length;const s=m/Math.max(fp.length,cp.length,1);if(s>bs){bs=s;best=e.leg;}});return bs>=0.4?best:null;}
 
 function parseSheet(ws){
   const ref=ws['!ref']||'A1:AE50';const rng=XLSX.utils.decode_range(ref);
-  const G=[];
-  for(let r=0;r<=rng.e.r;r++){const row=[];for(let c=0;c<Math.min(rng.e.c+1,35);c++){const cell=ws[XLSX.utils.encode_cell({r,c})];row.push(cell?String(cell.v??''):'');}G.push(row);}
+  const G=[];for(let r=0;r<=rng.e.r;r++){const row=[];for(let c=0;c<Math.min(rng.e.c+1,35);c++){const cell=ws[XLSX.utils.encode_cell({r,c})];row.push(cell?String(cell.v??''):'');}G.push(row);}
   const result={};
   for(let r=0;r<G.length-1;r++){
     if(G[r][0].trim()==='ID:'){
@@ -240,22 +259,50 @@ function setSt(t,m){const el=document.getElementById('fst');el.className='st '+t
 function getDias(m,y,q){const tot=new Date(y,m,0).getDate(),f=q===1?1:16,t=q===1?15:tot,dias=[];for(let d=f;d<=t;d++){const dt=new Date(y,m-1,d);dias.push({d,ds:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,dow:dt.getDay()});}return dias;}
 function calcSems(dias){const ws=[];let cur=null;dias.forEach(d=>{const wd=d.dow===0?7:d.dow;if(wd===1||!cur){if(cur)ws.push(cur);cur={dias:[]};}cur.dias.push(d);});if(cur&&cur.dias.length)ws.push(cur);return ws;}
 function getWidx(ds){for(let i=0;i<SEMS.length;i++)if(SEMS[i].dias.some(d=>d.ds===ds))return i;return -1;}
-function getVac(leg){return parseInt(document.getElementById('vac_'+leg)?.value||'0')||0;}
+function getDayVE(leg,day){return(DIAS_VE[leg]||{})[day]||null;}
+
+// Ciclo: null → 'V' → 'E' → null
+function togDayVE(leg,day,btn){
+  if(!DIAS_VE[leg])DIAS_VE[leg]={};
+  const cur=DIAS_VE[leg][day]||null;
+  const next=cur===null?'V':cur==='V'?'E':null;
+  if(next===null)delete DIAS_VE[leg][day];else DIAS_VE[leg][day]=next;
+  // Actualizar botón
+  btn.className='day-btn'+(next==='V'?' vac':next==='E'?' enf':'');
+  btn.textContent=next||btn.dataset.d;
+}
 
 function irP2(){
   if(!Object.keys(fileEmps).length){alert('Primero cargá el archivo del reloj.');return;}
   MES=+document.getElementById('sm2').value;ANIO=+document.getElementById('sa').value;
-  SEMS=calcSems(getDias(MES,ANIO,Q));TN={};
+  const dias=getDias(MES,ANIO,Q);
+  SEMS=calcSems(dias);TN={};DIAS_VE={};
   document.getElementById('p2lbl').textContent=`${Q===1?'1°':'2°'} Quincena — ${MN[MES]} ${ANIO}`;
   const act=EMPS.filter(e=>!e.excl);
-  const c=document.getElementById('semCont');c.innerHTML='';
+
+  // Semanas TN
+  const semC=document.getElementById('semCont');semC.innerHTML='';
   SEMS.forEach((s,wi)=>{
     TN[wi]=new Set();const f=s.dias[0],l=s.dias[s.dias.length-1];
     const d=document.createElement('div');d.className='wb';
     d.innerHTML=`<div class="wt">Semana ${wi+1} — días ${f.d} al ${l.d}</div><div class="chips">${act.map(e=>`<div class="chip" data-wi="${wi}" data-leg="${e.leg}" onclick="togTN(${wi},${e.leg},this)">${e.n}</div>`).join('')}<div class="chip cr" onclick="clrS(${wi})">↺ Limpiar</div></div>`;
-    c.appendChild(d);
+    semC.appendChild(d);
   });
-  document.getElementById('vacGrid').innerHTML=act.map(e=>`<div class="vac-item"><div class="vac-nom">${e.n}</div><input class="vac-inp" type="number" id="vac_${e.leg}" min="0" max="15" value="0"><div class="vac-lbl">días</div></div>`).join('');
+
+  // V/E por día
+  const vacC=document.getElementById('vacTable');vacC.innerHTML='';
+  act.forEach(ecfg=>{
+    DIAS_VE[ecfg.leg]={};
+    const row=document.createElement('div');row.className='vac-emp-row';
+    const dayBtns=dias.map(dia=>{
+      const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
+      const extra=fer?' fer':we?' we':'';
+      return `<div class="day-btn${extra}" data-leg="${ecfg.leg}" data-d="${dia.d}" title="${DN[dia.dow]} ${dia.d}" onclick="togDayVE(${ecfg.leg},${dia.d},this)">${dia.d}</div>`;
+    }).join('');
+    row.innerHTML=`<div class="vac-emp-nom">${ecfg.n}</div><div class="vac-days">${dayBtns}</div>`;
+    vacC.appendChild(row);
+  });
+
   ir(2);
 }
 function togTN(wi,leg,el){const n=+leg;TN[wi].has(n)?(TN[wi].delete(n),el.classList.remove('on')):(TN[wi].add(n),el.classList.add('on'));}
@@ -279,310 +326,246 @@ function calcH(t,isTN){
   const x=Math.round(Math.max(0,w-base)*1.5*10)/10;
   return{b:base,x,tot:base+x};
 }
+// Fin de semana: total = horas trabajadas × 2
+function calcHWE(t){
+  if(!t||!t.s)return 0;
+  let e=parseH(t.e),s=parseH(t.s);if(e===null||s===null)return 0;
+  if(s<=e)s+=24;
+  return Math.floor(s-e)*2;
+}
 
-// ── XLSX con colores usando JSZip ────────────────────────────────────────
-// Índices de estilos (xf) - definidos en buildStylesXML()
-const XF={
-  // headers
-  H_DIA:1, H_WE:2, H_FER:3, H_TOT:4,
-  // nombre empleado
-  EMP:5,
-  // turno
-  TUR_DIA:6, TUR_WE:7, TUR_FER:8,
-  // horario
-  HOR:9, HOR_WE:10, HOR_SINSAL:11, HOR_FER:12,
-  // base
-  BAS_DIA:13, BAS_WE:14, BAS_FER:15,
-  // extra
-  EXT_DIA:16, EXT_WE:17, EXT_FER:18,
-  // total
-  TOT_DIA:19, TOT_WE:20, TOT_FER:21,
-  // TOT col
-  COL_TOT:22,
-  // etiquetas
-  LBL_TUR:23, LBL_HOR:24, LBL_BAS:25, LBL_EXT:26, LBL_TOT:27,
-  // vac nota
-  VAC_NOTA:28,
-  // normal
-  NORM:0
-};
+// ── XLSX con colores (JSZip) ─────────────────────────────────────────────
+const XF={NORM:0,H_DIA:1,H_WE:2,H_FER:3,H_TOT:4,EMP:5,TUR_DIA:6,TUR_WE:7,TUR_FER:8,
+  HOR:9,HOR_WE:10,HOR_SINSAL:11,HOR_FER:12,HOR_VAC:13,HOR_ENF:14,
+  BAS_DIA:15,BAS_WE:16,BAS_FER:17,BAS_VE:18,
+  EXT_DIA:19,EXT_WE:20,EXT_FER:21,EXT_VE:22,
+  TOT_DIA:23,TOT_WE:24,TOT_FER:25,TOT_VE:26,
+  COL_TOT:27,LBL_TUR:28,LBL_HOR:29,LBL_BAS:30,LBL_EXT:31,LBL_TOT:32};
 
 function buildStylesXML(){
-  // fills: los 2 primeros son obligatorios (none y gray125)
   const fills=[
-    '<fill><patternFill patternType="none"/></fill>',
-    '<fill><patternFill patternType="gray125"/></fill>',
+    '<fill><patternFill patternType="none"/></fill>',          // 0
+    '<fill><patternFill patternType="gray125"/></fill>',        // 1
     '<fill><patternFill patternType="solid"><fgColor rgb="FF2E75B6"/></patternFill></fill>', // 2 hdr_dia
     '<fill><patternFill patternType="solid"><fgColor rgb="FFF4CCCC"/></patternFill></fill>', // 3 hdr_we
     '<fill><patternFill patternType="solid"><fgColor rgb="FFFFD966"/></patternFill></fill>', // 4 hdr_fer
     '<fill><patternFill patternType="solid"><fgColor rgb="FFC6EFCE"/></patternFill></fill>', // 5 hdr_tot
     '<fill><patternFill patternType="solid"><fgColor rgb="FF00B050"/></patternFill></fill>', // 6 emp
-    '<fill><patternFill patternType="solid"><fgColor rgb="FFE8F0FE"/></patternFill></fill>', // 7 tur
-    '<fill><patternFill patternType="solid"><fgColor rgb="FFEBF3FB"/></patternFill></fill>', // 8 bas
-    '<fill><patternFill patternType="solid"><fgColor rgb="FFFFF2CC"/></patternFill></fill>', // 9 ext
-    '<fill><patternFill patternType="solid"><fgColor rgb="FFE2EFDA"/></patternFill></fill>', // 10 tot
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFE8F0FE"/></patternFill></fill>', // 7 tur_dia
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFEBF3FB"/></patternFill></fill>', // 8 bas_dia
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFFFF2CC"/></patternFill></fill>', // 9 ext_dia
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFE2EFDA"/></patternFill></fill>', // 10 tot_dia
     '<fill><patternFill patternType="solid"><fgColor rgb="FFFFCCCC"/></patternFill></fill>', // 11 sin_sal
-    '<fill><patternFill patternType="solid"><fgColor rgb="FFD9F0D0"/></patternFill></fill>', // 12 vac
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFD4F0DA"/></patternFill></fill>', // 12 vac
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFFFF0D4"/></patternFill></fill>', // 13 enf
   ];
-  // fonts: 0=normal, 1=bold, 2=white-bold, 3=black-bold, 4=green-bold
   const fonts=[
-    '<font><sz val="10"/><name val="Calibri"/></font>',
-    '<font><sz val="10"/><b/><name val="Calibri"/></font>',
-    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FFFFFFFF"/></font>',
-    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FF000000"/></font>',
-    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FF0E7A3C"/></font>',
+    '<font><sz val="10"/><name val="Calibri"/></font>',                              // 0 normal
+    '<font><sz val="10"/><b/><name val="Calibri"/></font>',                          // 1 bold
+    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FFFFFFFF"/></font>',   // 2 white-bold
+    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FF000000"/></font>',   // 3 black-bold
+    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FF1B6B2A"/></font>',   // 4 green-bold (vac)
+    '<font><sz val="10"/><b/><name val="Calibri"/><color rgb="FF7A5200"/></font>',   // 5 amber-bold (enf)
   ];
-  // Función helpers
-  const xf=(fi,fli,ali)=>`<xf numFmtId="0" fontId="${fli}" fillId="${fi}" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1">${ali}</xf>`;
   const c=`<alignment horizontal="center" vertical="center"/>`;
   const l=`<alignment horizontal="left" vertical="center"/>`;
+  const xf=(fi,fli,ali)=>`<xf numFmtId="0" fontId="${fli}" fillId="${fi}" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1">${ali}</xf>`;
   const xfs=[
-    xf(0,0,c),         // 0 NORM
-    xf(2,2,c),         // 1 H_DIA (blue,white-bold,center)
-    xf(3,3,c),         // 2 H_WE  (pink,black-bold,center)
-    xf(4,3,c),         // 3 H_FER (yellow,black-bold,center)
-    xf(5,1,c),         // 4 H_TOT (green,bold,center)
-    xf(6,2,c),         // 5 EMP   (green,white-bold,center)
-    xf(7,0,c),         // 6 TUR_DIA
-    xf(3,0,c),         // 7 TUR_WE
-    xf(4,0,c),         // 8 TUR_FER
-    xf(0,0,c),         // 9 HOR (white)
-    xf(3,0,c),         // 10 HOR_WE
-    xf(11,1,c),        // 11 HOR_SINSAL (pink,bold)
-    xf(4,0,c),         // 12 HOR_FER
-    xf(8,0,c),         // 13 BAS_DIA
-    xf(3,0,c),         // 14 BAS_WE
-    xf(4,0,c),         // 15 BAS_FER
-    xf(9,0,c),         // 16 EXT_DIA
-    xf(3,0,c),         // 17 EXT_WE
-    xf(4,0,c),         // 18 EXT_FER
-    xf(10,1,c),        // 19 TOT_DIA (bold)
-    xf(3,1,c),         // 20 TOT_WE (pink,bold)
-    xf(4,1,c),         // 21 TOT_FER
-    xf(5,1,c),         // 22 COL_TOT (green,bold)
-    xf(7,0,l),         // 23 LBL_TUR
-    xf(0,0,l),         // 24 LBL_HOR
-    xf(8,0,l),         // 25 LBL_BAS
-    xf(9,0,l),         // 26 LBL_EXT
-    xf(10,1,l),        // 27 LBL_TOT (bold)
-    xf(12,4,c),        // 28 VAC_NOTA (green-bg,green-bold)
+    xf(0,0,c),   // 0 NORM
+    xf(2,2,c),   // 1 H_DIA
+    xf(3,3,c),   // 2 H_WE
+    xf(4,3,c),   // 3 H_FER
+    xf(5,1,c),   // 4 H_TOT
+    xf(6,2,c),   // 5 EMP
+    xf(7,0,c),   // 6 TUR_DIA
+    xf(3,0,c),   // 7 TUR_WE
+    xf(4,0,c),   // 8 TUR_FER
+    xf(0,0,c),   // 9 HOR
+    xf(3,0,c),   // 10 HOR_WE
+    xf(11,1,c),  // 11 HOR_SINSAL
+    xf(4,0,c),   // 12 HOR_FER
+    xf(12,4,c),  // 13 HOR_VAC (green)
+    xf(13,5,c),  // 14 HOR_ENF (amber)
+    xf(8,0,c),   // 15 BAS_DIA
+    xf(3,0,c),   // 16 BAS_WE
+    xf(4,0,c),   // 17 BAS_FER
+    xf(12,0,c),  // 18 BAS_VE (green bg)
+    xf(9,0,c),   // 19 EXT_DIA
+    xf(3,0,c),   // 20 EXT_WE
+    xf(4,0,c),   // 21 EXT_FER
+    xf(12,0,c),  // 22 EXT_VE
+    xf(10,1,c),  // 23 TOT_DIA
+    xf(3,1,c),   // 24 TOT_WE
+    xf(4,1,c),   // 25 TOT_FER
+    xf(12,1,c),  // 26 TOT_VE (green bold)
+    xf(5,1,c),   // 27 COL_TOT
+    xf(7,0,l),   // 28 LBL_TUR
+    xf(0,0,l),   // 29 LBL_HOR
+    xf(8,0,l),   // 30 LBL_BAS
+    xf(9,0,l),   // 31 LBL_EXT
+    xf(10,1,l),  // 32 LBL_TOT
   ];
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<fonts count="${fonts.length}">${fonts.join('')}</fonts>
-<fills count="${fills.length}">${fills.join('')}</fills>
-<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
-<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs>
-<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
-</styleSheet>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
 }
 
 function escXML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function colLetter(n){let s='';while(n>0){const r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
+function cv(v,s){return{v,s};}
 
-function buildSheetXML(rows, colWidths, merges){
-  // rows = array of arrays: each cell = {v, t, s} (value, type s/n, styleIndex)
+function buildSheetXML(rows,colWidths,merges){
   const colsXML=colWidths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('');
   const mergesXML=merges.length?`<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`:'';
   let rowsXML='';
   rows.forEach((row,ri)=>{
     let cells='';
     row.forEach((cell,ci)=>{
-      if(cell===null||cell===undefined||cell==='') return;
-      const addr=colLetter(ci+1)+(ri+1);
-      const s=cell.s||0;
-      if(typeof cell.v==='number'){
-        cells+=`<c r="${addr}" s="${s}"><v>${cell.v}</v></c>`;
-      }else{
-        cells+=`<c r="${addr}" t="inlineStr" s="${s}"><is><t>${escXML(cell.v)}</t></is></c>`;
-      }
+      if(cell===null||cell===undefined||cell==='')return;
+      const addr=colLetter(ci+1)+(ri+1);const s=cell.s||0;
+      if(typeof cell.v==='number')cells+=`<c r="${addr}" s="${s}"><v>${cell.v}</v></c>`;
+      else cells+=`<c r="${addr}" t="inlineStr" s="${s}"><is><t>${escXML(cell.v)}</t></is></c>`;
     });
     rowsXML+=`<row r="${ri+1}">${cells}</row>`;
   });
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<cols>${colsXML}</cols>
-<sheetData>${rowsXML}</sheetData>
-${mergesXML}
-</worksheet>`;
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols>${colsXML}</cols><sheetData>${rowsXML}</sheetData>${mergesXML}</worksheet>`;
 }
 
-function colLetter(n){let s='';while(n>0){const r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
-
-const CONTENT_TYPES=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-</Types>`;
-const RELS=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-</Relationships>`;
-const WB_RELS=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>`;
-
-function buildWB(sheetName){
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<sheets><sheet name="${escXML(sheetName)}" sheetId="1" r:id="rId1"/></sheets>
-</workbook>`;}
-
-function c(v,s){return{v,s};}  // cell helper
+const CT=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`;
+const RELS2=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+const WBR=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+const buildWB=n=>`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${escXML(n)}" sheetId="1" r:id="rId1"/></sheets></workbook>`;
 
 async function generarYDescargar(){
-  const btn=document.getElementById('btnGen');
-  btn.disabled=true;btn.textContent='Generando...';
+  const btn=document.getElementById('btnGen');btn.disabled=true;btn.textContent='Generando...';
   try{
-    const dias=getDias(MES,ANIO,Q);
-    const nDias=dias.length;
-    const totCol=nDias+2; // 1=A(spacer), 2=B(label), 3..N+2=días, N+3=TOT
+    const dias=getDias(MES,ANIO,Q);const nDias=dias.length;
     const qNom=Q===1?'1° Quincena':'2° Quincena';
     const fn=`Asistencia_${MN[MES]}_${ANIO}_${Q===1?'1Q':'2Q'}.xlsx`;
+    const colWidths=[2,24,...Array(nDias).fill(10.5),8];
+    const sheetRows=[],merges=[];
+    const totColIdx=nDias+2; // 0-based index de la columna TOT en el array
 
-    // Anchos de columna (1-based)
-    const colWidths=[2, 24, ...Array(nDias).fill(10.5), 8];
-
-    const sheetRows=[];
-    const merges=[];
-
-    // Fila 1: números de día
+    // Fila 1: números
     const r1=[null,null];
-    dias.forEach(d=>{
-      const we=d.dow===0||d.dow===6,fer=FERIAS.has(d.ds);
-      r1.push(c(d.d, fer?XF.H_FER:we?XF.H_WE:XF.H_DIA));
-    });
-    r1.push(c('TOT',XF.H_TOT));
-    sheetRows.push(r1);
+    dias.forEach(d=>{const we=d.dow===0||d.dow===6,fer=FERIAS.has(d.ds);r1.push(cv(d.d,fer?XF.H_FER:we?XF.H_WE:XF.H_DIA));});
+    r1.push(cv('TOT',XF.H_TOT));sheetRows.push(r1);
 
-    // Fila 2: días de semana
+    // Fila 2: días
     const r2=[null,null];
-    dias.forEach(d=>{
-      const we=d.dow===0||d.dow===6,fer=FERIAS.has(d.ds);
-      r2.push(c(DN[d.dow], fer?XF.H_FER:we?XF.H_WE:XF.H_DIA));
-    });
-    r2.push(c('hs',XF.H_TOT));
-    sheetRows.push(r2);
+    dias.forEach(d=>{const we=d.dow===0||d.dow===6,fer=FERIAS.has(d.ds);r2.push(cv(DN[d.dow],fer?XF.H_FER:we?XF.H_WE:XF.H_DIA));});
+    r2.push(cv('hs',XF.H_TOT));sheetRows.push(r2);
 
     const act=EMPS.filter(e=>!e.excl);
 
     act.forEach(ecfg=>{
-      const fe=fileEmps[ecfg.leg];
-      const att=fe?fe.att:{};
-      const vac=getVac(ecfg.leg);
-      const startRow=sheetRows.length+1; // 1-based
+      const fe=fileEmps[ecfg.leg];const att=fe?fe.att:{};
+      const startRow=sheetRows.length+1;
 
-      // Fila nombre (6 filas de bloque)
-      const rN=[null, c(ecfg.n.toUpperCase(), XF.EMP)];
-      for(let i=0;i<nDias+1;i++) rN.push(null); // merge cubrirá todo
+      const rN=[null,cv(ecfg.n.toUpperCase(),XF.EMP)];
+      for(let i=0;i<nDias+1;i++)rN.push(null);
       sheetRows.push(rN);
-      // Merge: col B(2) hasta col TOT(nDias+3)
       merges.push(`${colLetter(2)}${startRow}:${colLetter(nDias+3)}${startRow}`);
 
-      // Filas de datos
-      const rT=[null,c('Turno',XF.LBL_TUR)];
-      const rH=[null,c('Entrada / Salida',XF.LBL_HOR)];
-      const rB=[null,c('Horas base (9h)',XF.LBL_BAS)];
-      const rX=[null,c('Horas extra (x1.5)',XF.LBL_EXT)];
-      const rTo=[null,c('Horas totales',XF.LBL_TOT)];
-
+      const rT=[null,cv('Turno',XF.LBL_TUR)];
+      const rH=[null,cv('Entrada / Salida',XF.LBL_HOR)];
+      const rB=[null,cv('Horas base (9h)',XF.LBL_BAS)];
+      const rX=[null,cv('Horas extra (x1.5)',XF.LBL_EXT)];
+      const rTo=[null,cv('Horas totales',XF.LBL_TOT)];
       let sumB=0,sumX=0;
 
       dias.forEach(dia=>{
         const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
-        const wi=getWidx(dia.ds);
-        const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
-        const t=getTurno(att,dia.d,isTN);
+        const wi=getWidx(dia.ds);const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
+        const ve=getDayVE(ecfg.leg,dia.d);  // 'V', 'E', o null
+        const t=ve?null:getTurno(att,dia.d,isTN); // si tiene V/E, no usar fichaje
 
-        rT.push(c(isTN?'TN':'TM', fer?XF.TUR_FER:we?XF.TUR_WE:XF.TUR_DIA));
+        rT.push(cv(isTN?'TN':'TM',fer?XF.TUR_FER:we?XF.TUR_WE:XF.TUR_DIA));
 
-        if(fer&&(!t||!t.s)){
-          rH.push(c('F',XF.HOR_FER));
-          rB.push(c(8,XF.BAS_FER)); rX.push(c('-',XF.EXT_FER)); rTo.push(c(8,XF.TOT_FER));
+        if(ve){
+          // Vacaciones o Enfermedad — 8 hs, ignora fichaje
+          const xfH=ve==='V'?XF.HOR_VAC:XF.HOR_ENF;
+          const xfVE=XF.TOT_VE;
+          rH.push(cv(ve,xfH));
+          rB.push(cv(8,XF.BAS_VE));
+          rX.push(cv('-',XF.EXT_VE));
+          rTo.push(cv(8,xfVE));
           sumB+=8;
+        }else if(fer&&(!t||!t.s)){
+          rH.push(cv('F',XF.HOR_FER));rB.push(cv(8,XF.BAS_FER));rX.push(cv('-',XF.EXT_FER));rTo.push(cv(8,XF.TOT_FER));
+          sumB+=8;
+        }else if(we&&t&&t.s){
+          // Fin de semana trabajado: total = horas trabajadas × 2
+          const hsTot=calcHWE(t);
+          rH.push(cv(t.disp,XF.HOR_WE));
+          rB.push(cv('-',XF.BAS_WE));rX.push(cv('-',XF.EXT_WE));
+          rTo.push(cv(hsTot,XF.TOT_WE));
+          sumB+=hsTot; // va al total
         }else if(we&&(!t||!t.s)){
-          rH.push(c('',XF.HOR_WE)); rB.push(c('',XF.BAS_WE)); rX.push(c('',XF.EXT_WE)); rTo.push(c('',XF.TOT_WE));
+          rH.push(cv('',XF.HOR_WE));rB.push(cv('',XF.BAS_WE));rX.push(cv('',XF.EXT_WE));rTo.push(cv('',XF.TOT_WE));
         }else if(t&&t.s){
           const h=calcH(t,isTN);
-          rH.push(c(t.disp,XF.HOR));
-          rB.push(c(h.b, fer?XF.BAS_FER:we?XF.BAS_WE:XF.BAS_DIA));
-          rX.push(c(h.x||'-', fer?XF.EXT_FER:we?XF.EXT_WE:XF.EXT_DIA));
-          rTo.push(c(h.tot, fer?XF.TOT_FER:we?XF.TOT_WE:XF.TOT_DIA));
-          sumB+=h.b; sumX+=h.x;
+          rH.push(cv(t.disp,XF.HOR));
+          rB.push(cv(h.b,XF.BAS_DIA));rX.push(cv(h.x||'-',XF.EXT_DIA));rTo.push(cv(h.tot,XF.TOT_DIA));
+          sumB+=h.b;sumX+=h.x;
         }else if(t&&!t.s){
-          rH.push(c(t.e,XF.HOR_SINSAL)); rB.push(c('',XF.BAS_DIA)); rX.push(c('',XF.EXT_DIA)); rTo.push(c('',XF.TOT_DIA));
+          rH.push(cv(t.e,XF.HOR_SINSAL));rB.push(cv('',XF.BAS_DIA));rX.push(cv('',XF.EXT_DIA));rTo.push(cv('',XF.TOT_DIA));
         }else{
-          rH.push(c('',XF.HOR)); rB.push(c('',XF.BAS_DIA)); rX.push(c('',XF.EXT_DIA)); rTo.push(c('',XF.TOT_DIA));
+          rH.push(cv('',XF.HOR));rB.push(cv('',XF.BAS_DIA));rX.push(cv('',XF.EXT_DIA));rTo.push(cv('',XF.TOT_DIA));
         }
       });
 
-      // Vacaciones
-      sumB+=vac*8;
       const sumTot=Math.round((sumB+sumX)*10)/10;
-
-      // COL TOT
-      rT.push(vac>0?c(`V:${vac}d`,XF.VAC_NOTA):null);
-      rH.push(null);
-      rB.push(c(sumB,XF.COL_TOT));           // ← total horas base
-      rX.push(c(Math.round(sumX*10)/10||'-',XF.COL_TOT)); // ← total extras
-      rTo.push(c(sumTot,XF.COL_TOT));         // ← total = base + extra
-
+      rT.push(null);rH.push(null);
+      rB.push(cv(sumB,XF.COL_TOT));
+      rX.push(cv(Math.round(sumX*10)/10||'-',XF.COL_TOT));
+      rTo.push(cv(sumTot,XF.COL_TOT));
       sheetRows.push(rT,rH,rB,rX,rTo,[null]);
     });
 
     const sheetXML=buildSheetXML(sheetRows,colWidths,merges);
     const stylesXML=buildStylesXML();
-    const wbXML=buildWB(qNom);
-
     const zip=new JSZip();
-    zip.file('[Content_Types].xml',CONTENT_TYPES);
-    zip.folder('_rels').file('.rels',RELS);
-    const xl=zip.folder('xl');
-    xl.file('workbook.xml',wbXML);
-    xl.folder('_rels').file('workbook.xml.rels',WB_RELS);
-    xl.file('styles.xml',stylesXML);
+    zip.file('[Content_Types].xml',CT);zip.folder('_rels').file('.rels',RELS2);
+    const xl=zip.folder('xl');xl.file('workbook.xml',buildWB(qNom));
+    xl.folder('_rels').file('workbook.xml.rels',WBR);xl.file('styles.xml',stylesXML);
     xl.folder('worksheets').file('sheet1.xml',sheetXML);
 
     const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=fn;a.click();
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fn;a.click();
     setTimeout(()=>URL.revokeObjectURL(url),10000);
 
-    document.getElementById('btnDL').onclick=async()=>{
-      const b=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-      const u=URL.createObjectURL(b);const aa=document.createElement('a');aa.href=u;aa.download=fn;aa.click();setTimeout(()=>URL.revokeObjectURL(u),10000);
-    };
+    document.getElementById('btnDL').onclick=async()=>{const b=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const u=URL.createObjectURL(b);const aa=document.createElement('a');aa.href=u;aa.download=fn;aa.click();setTimeout(()=>URL.revokeObjectURL(u),10000);};
     document.getElementById('xlInfo').textContent=`${MN[MES]} ${ANIO} — ${qNom} — ${act.length} empleados`;
-    renderPrev(dias);
-    ir(3);
+    renderPrev(dias);ir(3);
   }catch(err){alert('Error: '+err.message);console.error(err);}
   finally{btn.disabled=false;btn.textContent='⚡ Generar y Descargar Excel';}
 }
 
 function renderPrev(dias){
   const act=EMPS.filter(e=>!e.excl);
-  let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">Vac.</th><th class="nr">Hs Base</th><th class="nr">Hs Extra</th><th class="nr">Total</th><th>Turno</th></tr></thead><tbody>`;
-  let tot=0;
+  let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">Vac.</th><th class="nr">Enf.</th><th class="nr">Hs Base</th><th class="nr">Hs Extra</th><th class="nr">Total</th><th>Turno</th></tr></thead><tbody>`;
+  let totG=0;
   act.forEach(ecfg=>{
-    const fe=fileEmps[ecfg.leg];const att=fe?fe.att:{};const vac=getVac(ecfg.leg);
-    let d=0,b=0,x=0,t=0,hasTN=false;
+    const fe=fileEmps[ecfg.leg];const att=fe?fe.att:{};
+    let d=0,b=0,x=0,t=0,hasTN=false,nV=0,nE=0;
     dias.forEach(dia=>{
+      const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
       const wi=getWidx(dia.ds);const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
       if(isTN)hasTN=true;
-      if(FERIAS.has(dia.ds)&&!att[dia.d]){b+=8;t+=8;return;}
+      const ve=getDayVE(ecfg.leg,dia.d);
+      if(ve==='V'){nV++;b+=8;t+=8;return;}
+      if(ve==='E'){nE++;b+=8;t+=8;return;}
+      if(fer){b+=8;t+=8;return;}
       const tr=getTurno(att,dia.d,isTN);
-      if(tr&&tr.s){d++;const h2=calcH(tr,isTN);b+=h2.b;x+=h2.x;t+=h2.tot;}
+      if(!tr||!tr.s)return;
+      d++;
+      if(we){const hs=calcHWE(tr);t+=hs;b+=hs;}
+      else{const h=calcH(tr,isTN);b+=h.b;x+=h.x;t+=h.tot;}
     });
-    b+=vac*8;t+=vac*8;tot+=t;
-    const tag=hasTN?'<span class="bx btn2">TN</span>':vac>0?'<span class="bx bvac">VAC</span>':'<span class="bx btm">TM</span>';
-    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr" style="color:var(--grn)">${vac>0?vac+'d':'-'}</td><td class="nr">${b}</td><td class="nr">${Math.round(x*10)/10||'-'}</td><td class="nr fw">${Math.round(t*10)/10}</td><td>${tag}</td></tr>`;
+    totG+=t;
+    const tag=hasTN?'<span class="bx btn2">TN</span>':'<span class="bx btm">TM</span>';
+    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr" style="color:#1b6b2a">${nV||'-'}</td><td class="nr" style="color:#7a5200">${nE||'-'}</td><td class="nr">${b}</td><td class="nr">${Math.round(x*10)/10||'-'}</td><td class="nr fw">${Math.round(t*10)/10}</td><td>${tag}</td></tr>`;
   });
-  h+=`</tbody><tfoot><tr><td colspan="6">TOTAL PLANTEL</td><td class="nr">${Math.round(tot*10)/10}</td><td></td></tr></tfoot></table>`;
+  h+=`</tbody><tfoot><tr><td colspan="7">TOTAL PLANTEL</td><td class="nr">${Math.round(totG*10)/10}</td><td></td></tr></tfoot></table>`;
   document.getElementById('prevTbl').innerHTML=h;
 }
 </script>
