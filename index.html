@@ -6,22 +6,22 @@
 <title>Winflex — Asistencia</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f0f2f5;--sur:#fff;--card:#fff;--c2:#f8f9fb;--brd:#dde1e7;--acc:#1a56e8;--al:#edf2fe;--grn:#0e7a3c;--gl:#edfaf2;--org:#c4620a;--ol:#fff4e8;--red:#c8291e;--rl:#fef2f1;--txt:#1a1f36;--dim:#5a6072;--mut:#9aa0b0;--r:10px}
+:root{--bg:#f0f2f5;--sur:#fff;--c2:#f8f9fb;--brd:#dde1e7;--acc:#1a56e8;--al:#edf2fe;--grn:#0e7a3c;--gl:#edfaf2;--org:#c4620a;--ol:#fff4e8;--red:#c8291e;--rl:#fef2f1;--txt:#1a1f36;--dim:#5a6072;--mut:#9aa0b0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
-.hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:0 28px;display:flex;align-items:center;height:54px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:0 28px;display:flex;align-items:center;height:54px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .logo{font-size:15px;font-weight:700}.logo em{color:var(--acc);font-style:normal}
 .steps{display:flex;align-items:center;gap:2px;margin-left:auto}
 .step{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:6px;color:var(--mut);font-size:12px;font-weight:500}
 .step.on{background:var(--al);color:var(--acc);font-weight:600}.step.done{color:var(--grn)}
 .dot{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
 .sep{width:20px;height:1px;background:var(--brd)}
-.wrap{max-width:980px;margin:0 auto;padding:26px 18px}
-.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.wrap{max-width:980px;margin:0 auto;padding:24px 18px}
+.card{background:var(--sur);border:1px solid var(--brd);border-radius:10px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .hd{font-weight:600;font-size:14px;margin-bottom:14px}
-.drop{border:2px dashed var(--brd);border-radius:var(--r);padding:32px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--c2)}
+.drop{border:2px dashed var(--brd);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:.2s;background:var(--c2)}
 .drop:hover,.drop.drag{border-color:var(--acc);background:var(--al)}
-.drop p{color:var(--dim);line-height:1.6}.drop strong{color:var(--acc)}
+.drop p{color:var(--dim);line-height:1.7}.drop strong{color:var(--acc)}
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
 .fg{display:flex;flex-direction:column;gap:5px}
 .fg label{font-size:11px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
@@ -29,21 +29,20 @@ select,input[type=number]{background:var(--sur);border:1.5px solid var(--brd);bo
 select:focus,input:focus{border-color:var(--acc)}
 .qt{display:flex;border:1.5px solid var(--brd);border-radius:8px;overflow:hidden}
 .qo{flex:1;padding:9px 14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--dim);background:var(--sur);border:none;outline:none;white-space:nowrap}
-.qo:first-child{border-right:1px solid var(--brd)}
-.qo.s{background:var(--acc);color:#fff}.qo:not(.s):hover{background:var(--al);color:var(--acc)}
+.qo:first-child{border-right:1px solid var(--brd)}.qo.s{background:var(--acc);color:#fff}
+.qo:not(.s):hover{background:var(--al);color:var(--acc)}
 .btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:6px}
 .bp{background:var(--acc);color:#fff}.bp:hover{background:#1445c4}
 .bs{background:var(--grn);color:#fff}.bs:hover{background:#0b6432}
 .bg{background:transparent;color:var(--dim);border:1.5px solid var(--brd)}.bg:hover{border-color:var(--acc);color:var(--acc)}
 .blg{padding:12px 26px;font-size:14px}
-.st{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;border:1px solid transparent}
+.st{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;border:1px solid transparent}
 .ok{background:var(--gl);border-color:rgba(14,122,60,.2);color:var(--grn)}
 .er{background:var(--rl);border-color:rgba(200,41,30,.2);color:var(--red)}
-.wn{background:#fff8e1;border-color:#f0c040;color:#7a5800}
 .el{display:flex;flex-direction:column}
 .er-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd)}
 .er-row:last-child{border-bottom:none}
-.leg{font-size:11px;font-weight:700;color:var(--mut);width:28px;text-align:right}
+.leg{font-size:11px;font-weight:700;color:var(--mut);width:28px;text-align:right;flex-shrink:0}
 .ni{flex:1;background:var(--c2);border:1px solid var(--brd);border-radius:6px;padding:6px 10px;color:var(--txt);font-size:13px;outline:none}
 .xb{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--brd);background:transparent;color:var(--dim);cursor:pointer}
 .xb.on{border-color:var(--red);color:var(--red);background:var(--rl)}
@@ -55,7 +54,7 @@ select:focus,input:focus{border-color:var(--acc)}
 .chip:hover{border-color:var(--org);color:var(--org)}
 .chip.on{border-color:var(--org);background:var(--ol);color:var(--org);font-weight:600}
 .cr{border-style:dashed;font-size:11px}
-.tw{overflow-x:auto}
+.tw{overflow-x:auto;margin-top:8px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{background:var(--c2);padding:9px 12px;text-align:left;color:var(--dim);font-weight:600;border-bottom:2px solid var(--brd);white-space:nowrap}
 td{padding:8px 12px;border-bottom:1px solid var(--brd)}
@@ -69,12 +68,12 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
 .sc .ico{font-size:52px;margin-bottom:12px}
 .sc h2{font-size:21px;font-weight:700;margin-bottom:6px}
 .sc .sub{color:var(--dim);margin-bottom:22px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:var(--al);color:var(--acc)}
 .hid{display:none!important}
 .sm{font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body>
-
 <div class="hdr">
   <div class="logo">WINFLEX <em>| Asistencia</em></div>
   <div class="steps">
@@ -88,112 +87,104 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
 
 <div class="wrap">
 
-  <div id="p1">
-    <div class="card">
-      <div class="hd">📂 Archivo del reloj biométrico</div>
-      <div class="drop" id="dz" onclick="document.getElementById('fi').click()">
-        <p style="font-size:36px;margin-bottom:8px">📋</p>
-        <p><strong>Clic para seleccionar</strong> o arrastrá el archivo aquí</p>
-        <p class="sm" style="margin-top:5px">Formato: 1_report.xls — buscará la hoja "Reporte de Asistencia"</p>
-      </div>
-      <input type="file" id="fi" accept=".xls,.xlsx" style="display:none">
-      <div id="fst" class="hid"></div>
+<!-- PASO 1 -->
+<div id="p1">
+  <div class="card">
+    <div class="hd">📂 Archivo del reloj (1_report.xls)</div>
+    <div class="drop" id="dz" onclick="document.getElementById('fi').click()">
+      <p style="font-size:36px;margin-bottom:8px">📋</p>
+      <p><strong>Clic para seleccionar</strong> o arrastrá el archivo aquí</p>
+      <p class="sm" style="margin-top:4px">Se leerá la hoja "Reporte de Asistencia"</p>
     </div>
-
-    <div class="card hid" id="mapCard">
-      <div class="hd">🔎 Confirmá las columnas del archivo</div>
-      <p class="sm" style="margin-bottom:14px">La app detectó estas columnas. Corregí si alguna no es correcta:</p>
-      <div class="row" style="margin-bottom:16px">
-        <div class="fg"><label>Legajo / ID empleado</label><select id="cId"></select></div>
-        <div class="fg"><label>Fecha</label><select id="cFecha"></select></div>
-        <div class="fg"><label>Hora</label><select id="cHora"></select></div>
-      </div>
-      <p class="sm" style="margin-bottom:8px;font-weight:600">Primeras filas del archivo:</p>
-      <div class="tw" id="rawPrev"></div>
-    </div>
-
-    <div class="card">
-      <div class="hd">📅 Período a liquidar</div>
-      <div class="row">
-        <div class="fg"><label>Mes</label>
-          <select id="sm">
-            <option value="1">Enero</option><option value="2">Febrero</option>
-            <option value="3">Marzo</option><option value="4">Abril</option>
-            <option value="5">Mayo</option><option value="6">Junio</option>
-            <option value="7">Julio</option><option value="8">Agosto</option>
-            <option value="9">Septiembre</option><option value="10">Octubre</option>
-            <option value="11">Noviembre</option><option value="12">Diciembre</option>
-          </select>
-        </div>
-        <div class="fg"><label>Año</label>
-          <input type="number" id="sa" value="2026" min="2024" max="2030" style="width:100px">
-        </div>
-        <div class="fg"><label>Quincena</label>
-          <div class="qt">
-            <button class="qo s" id="q1" onclick="setQ(1)">1° Quincena (1–15)</button>
-            <button class="qo" id="q2" onclick="setQ(2)">2° Quincena (16–fin)</button>
-          </div>
-        </div>
-      </div>
-      <p class="sm" id="rng" style="margin-top:10px"></p>
-    </div>
-
-    <div class="card">
-      <div class="hd">👥 Nómina</div>
-      <p class="sm" style="margin-bottom:12px">Editá nombres o excluí temporalmente del reporte.</p>
-      <div class="el" id="empEd"></div>
-    </div>
-
-    <button class="btn bp blg" onclick="irPaso2()">Continuar →</button>
-  </div>
-
-  <div id="p2" class="hid">
-    <div class="card">
-      <div class="hd">🌙 Turno Noche — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
-      <p class="sm" style="margin-bottom:14px">Seleccioná quién estuvo de noche en cada semana (+1 hs base por día trabajado en TN).</p>
-      <div class="wl" id="semCont"></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn bg" onclick="ir(1)">← Atrás</button>
-      <button class="btn bp" onclick="genExcel()">⚡ Generar Excel</button>
+    <input type="file" id="fi" accept=".xls,.xlsx" style="display:none">
+    <div id="fst" class="hid"></div>
+    <div id="empDet" class="hid" style="margin-top:14px">
+      <p class="sm fw" style="margin-bottom:8px">Empleados detectados:</p>
+      <div class="tw"><table><thead><tr><th>Nombre en el reloj</th><th>Legajo mapeado</th><th>Días con datos</th></tr></thead><tbody id="detB"></tbody></table></div>
     </div>
   </div>
 
-  <div id="p3" class="hid">
-    <div class="card">
-      <div class="sc">
-        <div class="ico">✅</div>
-        <h2>Excel generado</h2>
-        <div class="sub" id="xlInfo"></div>
-        <button class="btn bs blg" id="btnDL">⬇️ Volver a descargar</button>
-      </div>
+  <div class="card">
+    <div class="hd">📅 Período</div>
+    <div class="row">
+      <div class="fg"><label>Mes</label>
+        <select id="sm2">
+          <option value="1">Enero</option><option value="2">Febrero</option>
+          <option value="3">Marzo</option><option value="4">Abril</option>
+          <option value="5">Mayo</option><option value="6">Junio</option>
+          <option value="7">Julio</option><option value="8">Agosto</option>
+          <option value="9">Septiembre</option><option value="10">Octubre</option>
+          <option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select></div>
+      <div class="fg"><label>Año</label><input type="number" id="sa" value="2026" min="2024" max="2030" style="width:100px"></div>
+      <div class="fg"><label>Quincena</label>
+        <div class="qt">
+          <button class="qo s" id="q1" onclick="setQ(1)">1° Quincena (1–15)</button>
+          <button class="qo" id="q2" onclick="setQ(2)">2° Quincena (16–fin)</button>
+        </div></div>
     </div>
-    <div class="card">
-      <div class="hd">📊 Resumen del período</div>
-      <div class="tw" id="prevTbl"></div>
-    </div>
-    <div style="margin-top:14px"><button class="btn bg" onclick="ir(1)">← Nuevo reporte</button></div>
+    <p class="sm" id="rng" style="margin-top:10px"></p>
   </div>
 
+  <div class="card">
+    <div class="hd">👥 Nómina</div>
+    <p class="sm" style="margin-bottom:12px">Excluí quien no deba aparecer en el reporte.</p>
+    <div class="el" id="empEd"></div>
+  </div>
+
+  <button class="btn bp blg" onclick="irP2()">Continuar →</button>
 </div>
 
+<!-- PASO 2 -->
+<div id="p2" class="hid">
+  <div class="card">
+    <div class="hd">🌙 Turno Noche — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
+    <p class="sm" style="margin-bottom:14px">Seleccioná quién estuvo de noche cada semana. TN suma +1 hs base y calcula cruce de medianoche.</p>
+    <div class="wl" id="semCont"></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:4px">
+    <button class="btn bg" onclick="ir(1)">← Atrás</button>
+    <button class="btn bp" id="btnGen" onclick="generarYDescargar()">⚡ Generar y Descargar Excel</button>
+  </div>
+</div>
+
+<!-- PASO 3 -->
+<div id="p3" class="hid">
+  <div class="card">
+    <div class="sc">
+      <div class="ico">✅</div>
+      <h2>Descargado</h2>
+      <div class="sub" id="xlInfo"></div>
+      <button class="btn bs blg" id="btnDL">⬇️ Descargar de nuevo</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="hd">📊 Resumen</div>
+    <div class="tw" id="prevTbl"></div>
+  </div>
+  <div style="margin-top:14px"><button class="btn bg" onclick="ir(1)">← Nuevo reporte</button></div>
+</div>
+
+</div><!-- wrap -->
+
 <script>
-const EMP_DEF = [
-  {id:3, n:"Brest Juan Andrés"},
-  {id:20,n:"Luna Gabriel Ignacio"},
-  {id:22,n:"Vera Juan Alberto"},
-  {id:18,n:"Silva Silvina Viviana"},
-  {id:21,n:"Rodriguez Alan Damian"},
-  {id:25,n:"Moreno Fernando Ezequiel"},
-  {id:27,n:"Delelis Matías Emanuel"},
-  {id:28,n:"Rodriguez Carlos Andrés"},
-  {id:49,n:"Herrera Fatima"},
-  {id:32,n:"Delelis Alejandro Alexis"},
-  {id:52,n:"Vera Alan"},
-  {id:51,n:"Garbia Luis Jorge"},
-  {id:55,n:"Jose Antonio"},
+// ── Nómina ────────────────────────────────────────────────────────────────
+const CFG = [
+  {leg:3,  n:"Brest Juan Andrés"},
+  {leg:20, n:"Luna Gabriel Ignacio"},
+  {leg:22, n:"Vera Juan Alberto"},
+  {leg:18, n:"Silva Silvina Viviana"},
+  {leg:21, n:"Rodriguez Alan Damian"},
+  {leg:25, n:"Moreno Fernando Ezequiel"},
+  {leg:27, n:"Delelis Matías Emanuel"},
+  {leg:28, n:"Rodriguez Carlos Andrés"},
+  {leg:49, n:"Herrera Fatima"},
+  {leg:32, n:"Delelis Alejandro Alexis"},
+  {leg:52, n:"Vera Alan"},
+  {leg:51, n:"Garbia Luis Jorge"},
+  {leg:55, n:"Jose Antonio"},
 ];
-const EXCL_FIJOS = new Set([1,15,16,50,10000]);
+const EXCL_IDS = new Set([10000,1,15,16,50]);
 const FERIAS = new Set([
   "2025-01-01","2025-03-03","2025-03-04","2025-03-24","2025-04-02",
   "2025-04-17","2025-04-18","2025-05-01","2025-05-25","2025-06-16",
@@ -203,45 +194,100 @@ const FERIAS = new Set([
   "2026-06-15","2026-07-09","2026-08-17","2026-10-12","2026-11-20",
   "2026-12-08","2026-12-25",
 ]);
-const MN = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const DN = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+const MN=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DN=['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
 
-let EMPS = EMP_DEF.map(e=>({...e, excl:false}));
-let rawData = null, Q=1, MES, ANIO, SEMS=[], TN={}, lastWB=null, lastFN='';
+// ── Estado ────────────────────────────────────────────────────────────────
+let EMPS = CFG.map(e=>({...e,excl:false}));
+let fileEmps = {};   // legajo → {att: {day: "HH:MMhh:mm"}}
+let Q=1, MES, ANIO, SEMS=[], TN={};
 
-// Init
-const n=new Date();
-document.getElementById('sm').value=n.getMonth()+1;
-document.getElementById('sa').value=n.getFullYear();
+// ── Init ──────────────────────────────────────────────────────────────────
+const now=new Date();
+document.getElementById('sm2').value=now.getMonth()+1;
+document.getElementById('sa').value=now.getFullYear();
 renderEmps(); updRng();
-document.getElementById('sm').onchange=updRng;
+document.getElementById('sm2').onchange=updRng;
 document.getElementById('sa').onchange=updRng;
 
 function setQ(q){Q=q;document.getElementById('q1').classList.toggle('s',q===1);document.getElementById('q2').classList.toggle('s',q===2);updRng();}
 function updRng(){
-  const m=+document.getElementById('sm').value, y=+document.getElementById('sa').value;
-  const ult=new Date(y,m,0).getDate();
-  const d1=Q===1?1:16, d2=Q===1?15:ult;
+  const m=+document.getElementById('sm2').value,y=+document.getElementById('sa').value;
+  const ult=new Date(y,m,0).getDate(),d1=Q===1?1:16,d2=Q===1?15:ult;
   document.getElementById('rng').textContent=`Período: ${d1} al ${d2} de ${MN[m]} ${y}`;
 }
-
-function ir(n){[1,2,3].forEach(i=>{
-  document.getElementById('p'+i).classList.toggle('hid',i!==n);
-  const b=document.getElementById('s'+i);
-  b.className='step'+(i===n?' on':i<n?' done':'');
-});window.scrollTo(0,0);}
-
+function ir(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('p'+i).classList.toggle('hid',i!==n);
+    document.getElementById('s'+i).className='step'+(i===n?' on':i<n?' done':'');
+  });
+  window.scrollTo(0,0);
+}
 function renderEmps(){
   document.getElementById('empEd').innerHTML=EMPS.map((e,i)=>`
     <div class="er-row">
-      <div class="leg">${e.id}</div>
+      <div class="leg">${e.leg}</div>
       <input class="ni" type="text" value="${e.n}" onchange="EMPS[${i}].n=this.value">
-      <button class="xb ${e.excl?'on':''}" onclick="toggleX(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button>
+      <button class="xb ${e.excl?'on':''}" onclick="togX(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button>
     </div>`).join('');
 }
-function toggleX(i,b){EMPS[i].excl=!EMPS[i].excl;b.textContent=EMPS[i].excl?'✕ Excluido':'Activo';b.classList.toggle('on',EMPS[i].excl);}
+function togX(i,b){EMPS[i].excl=!EMPS[i].excl;b.textContent=EMPS[i].excl?'✕ Excluido':'Activo';b.classList.toggle('on',EMPS[i].excl);}
 
-// --- FILE LOAD ---
+// ── Normalización de nombres ──────────────────────────────────────────────
+function norm(s){
+  return s.toLowerCase()
+    .replace(/[áàâ]/g,'a').replace(/[éèê]/g,'e').replace(/[íìî]/g,'i')
+    .replace(/[óòô]/g,'o').replace(/[úùûü]/g,'u').replace(/ñ/g,'n')
+    .replace(/,/g,' ').replace(/\s+/g,' ').trim();
+}
+function matchLeg(fname){
+  const fp=norm(fname).split(' ').filter(p=>p.length>2);
+  let best=null,bs=0;
+  EMPS.forEach(e=>{
+    const cp=norm(e.n).split(' ').filter(p=>p.length>2);
+    const m=fp.filter(p=>cp.includes(p)).length;
+    const s=m/Math.max(fp.length,cp.length,1);
+    if(s>bs){bs=s;best=e.leg;}
+  });
+  return bs>=0.4?best:null;
+}
+
+// ── Parsear hoja "Reporte de Asistencia" ─────────────────────────────────
+function parseSheet(ws){
+  const ref=ws['!ref']||'A1:AE50';
+  const range=XLSX.utils.decode_range(ref);
+  const nrows=range.e.r+1, ncols=Math.min(range.e.c+1,35);
+  // Armar grilla de strings
+  const G=[];
+  for(let r=0;r<nrows;r++){
+    const row=[];
+    for(let c=0;c<ncols;c++){
+      const cell=ws[XLSX.utils.encode_cell({r,c})];
+      row.push(cell?(String(cell.v??'')):'');
+    }
+    G.push(row);
+  }
+  const result={};
+  for(let r=0;r<G.length-1;r++){
+    if(G[r][0].trim()==='ID:'){
+      const fid=parseInt(G[r][2]);
+      const fname=G[r][10]||'';
+      if(!fid||isNaN(fid)||EXCL_IDS.has(fid)) continue;
+      const leg=matchLeg(fname);
+      if(!leg) continue;
+      const attRow=G[r+1]||[];
+      const att={};
+      for(let c=0;c<31;c++){
+        const v=(attRow[c]||'').trim();
+        if(v) att[c+1]=v;
+      }
+      result[leg]={leg,fname,att};
+    }
+  }
+  return result;
+}
+
+// ── Carga de archivo ──────────────────────────────────────────────────────
 const dz=document.getElementById('dz');
 document.getElementById('fi').onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0]);};
 dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');};
@@ -252,290 +298,219 @@ function loadFile(file){
   const r=new FileReader();
   r.onload=ev=>{
     try{
-      const wb=XLSX.read(ev.target.result,{type:'binary',cellDates:true,raw:false});
-      // Buscar hoja correcta
-      let sh=wb.SheetNames.find(n=>n.toLowerCase().includes('reporte')||n.toLowerCase().includes('asistencia'));
-      let msg='', tipo='ok';
-      if(sh){
-        msg=`Hoja: "${sh}"`;
-      }else{
-        sh=wb.SheetNames[0];
-        tipo='wn';
-        msg=`⚠️ No encontré "Reporte de Asistencia". Usando: "${sh}". Disponibles: ${wb.SheetNames.join(', ')}`;
-      }
-      const ws=wb.Sheets[sh];
-      rawData=XLSX.utils.sheet_to_json(ws,{raw:false,defval:''});
-      if(!rawData||!rawData.length){setSt('er','❌ La hoja "'+sh+'" está vacía.');return;}
-      setSt(tipo,`✅ ${file.name} — ${rawData.length} registros. ${msg}`);
+      const wb=XLSX.read(ev.target.result,{type:'binary'});
+      const shName=wb.SheetNames.find(n=>n.includes('Asistencia'))||wb.SheetNames[0];
+      fileEmps=parseSheet(wb.Sheets[shName]);
+      const n=Object.keys(fileEmps).length;
+      setSt('ok',`✅ ${file.name} — "${shName}" — ${n} empleados mapeados`);
       dz.style.opacity='.5'; dz.style.pointerEvents='none';
-      showMap(rawData);
-    }catch(e){setSt('er','❌ Error: '+e.message);}
+      // Mostrar tabla de detección
+      let rows='';
+      Object.values(fileEmps).forEach(fe=>{
+        const cfg=EMPS.find(e=>e.leg===fe.leg);
+        rows+=`<tr><td>${fe.fname}</td><td><span class="tag">Leg.${fe.leg} — ${cfg?cfg.n:''}</span></td><td class="nr">${Object.keys(fe.att).length}</td></tr>`;
+      });
+      document.getElementById('detB').innerHTML=rows;
+      document.getElementById('empDet').classList.remove('hid');
+    }catch(err){setSt('er','❌ '+err.message);console.error(err);}
   };
   r.readAsBinaryString(file);
 }
-
 function setSt(t,m){const el=document.getElementById('fst');el.className='st '+t;el.textContent=m;el.classList.remove('hid');}
 
-function getIdCol(){return document.getElementById('cId')?.value||'';}
-function getFechaCol(){return document.getElementById('cFecha')?.value||'';}
-function getHoraCol(){return document.getElementById('cHora')?.value||'';}
-
-function showMap(data){
-  const keys=Object.keys(data[0]);
-  // Auto-detect
-  const aId   = keys.find(k=>/enroll|userid|user.id|no\b|legajo/i.test(k)) || keys[0];
-  const aFecha= keys.find(k=>/date|fecha/i.test(k)&&!/time|hora/i.test(k)) || keys.find(k=>/date|fecha/i.test(k));
-  const aHora = keys.find(k=>/time|hora/i.test(k)&&!/date|fecha/i.test(k)) || keys.find(k=>/time|hora/i.test(k));
-
-  const opts='<option value="">— ninguna —</option>'+keys.map(k=>`<option value="${k}">${k}</option>`).join('');
-  ['cId','cFecha','cHora'].forEach(id=>{document.getElementById(id).innerHTML=opts;});
-  document.getElementById('cId').value   = aId    ||'';
-  document.getElementById('cFecha').value= aFecha ||'';
-  document.getElementById('cHora').value = aHora  ||'';
-
-  // Preview table (5 rows)
-  const prev=data.slice(0,5);
-  let h=`<table><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>`;
-  prev.forEach(row=>{h+=`<tr>${keys.map(k=>`<td style="white-space:nowrap">${row[k]??''}</td>`).join('')}</tr>`;});
-  h+='</tbody></table>';
-  document.getElementById('rawPrev').innerHTML=h;
-  document.getElementById('mapCard').classList.remove('hid');
-
-  // Re-detect employees when columns change
-  ['cId','cFecha','cHora'].forEach(id=>document.getElementById(id).addEventListener('change',()=>detectNew(rawData)));
-  detectNew(rawData);
-}
-
-function detectNew(data){
-  if(!data||!data.length) return;
-  const idc=getIdCol()||Object.keys(data[0])[0];
-  const nc=Object.keys(data[0]).find(k=>/name|nombre/i.test(k));
-  const known=new Set(EMPS.map(e=>e.id));
-  const nuevo=new Set();
-  data.forEach(row=>{
-    const id=parseInt(String(row[idc]||'').trim());
-    if(!id||isNaN(id)||EXCL_FIJOS.has(id)||known.has(id)||nuevo.has(id)) return;
-    nuevo.add(id);
-    const nm=nc?String(row[nc]||'').trim():`ID ${id}`;
-    EMPS.push({id,n:nm||`ID ${id}`,excl:true});
-  });
-  if(nuevo.size) renderEmps();
-}
-
-// --- PASO 2 ---
-function getDiasQ(m,y,q){
-  const tot=new Date(y,m,0).getDate();
-  const f=q===1?1:16, t=q===1?15:tot;
-  const dias=[];
+// ── Días y semanas ────────────────────────────────────────────────────────
+function getDias(m,y,q){
+  const tot=new Date(y,m,0).getDate(),f=q===1?1:16,t=q===1?15:tot,dias=[];
   for(let d=f;d<=t;d++){
     const dt=new Date(y,m-1,d);
     dias.push({d,ds:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,dow:dt.getDay()});
   }
-  return dias;
+  return dias; // dow: 0=Dom,6=Sab
 }
-
 function calcSems(dias){
   const ws=[];let cur=null;
   dias.forEach(d=>{const wd=d.dow===0?7:d.dow;if(wd===1||!cur){if(cur)ws.push(cur);cur={dias:[]};}cur.dias.push(d);});
   if(cur&&cur.dias.length)ws.push(cur);
-  ws.forEach((w,i)=>w.idx=i);
   return ws;
 }
+function getWidx(ds){for(let i=0;i<SEMS.length;i++)if(SEMS[i].dias.some(d=>d.ds===ds))return i;return -1;}
 
-function irPaso2(){
-  if(!rawData){alert('⚠️ Primero cargá el archivo del reloj.');return;}
-  MES=+document.getElementById('sm').value;
+// ── Paso 2 ────────────────────────────────────────────────────────────────
+function irP2(){
+  if(!Object.keys(fileEmps).length){alert('Primero cargá el archivo del reloj.');return;}
+  MES=+document.getElementById('sm2').value;
   ANIO=+document.getElementById('sa').value;
-  const dias=getDiasQ(MES,ANIO,Q);
-  SEMS=calcSems(dias); TN={};
+  SEMS=calcSems(getDias(MES,ANIO,Q)); TN={};
   document.getElementById('p2lbl').textContent=`${Q===1?'1°':'2°'} Quincena — ${MN[MES]} ${ANIO}`;
   const act=EMPS.filter(e=>!e.excl);
-  const c=document.getElementById('semCont'); c.innerHTML='';
+  const c=document.getElementById('semCont');c.innerHTML='';
   SEMS.forEach((s,wi)=>{
     TN[wi]=new Set();
     const f=s.dias[0],l=s.dias[s.dias.length-1];
-    const d=document.createElement('div'); d.className='wb';
+    const d=document.createElement('div');d.className='wb';
     d.innerHTML=`<div class="wt">Semana ${wi+1} — días ${f.d} al ${l.d}</div>
       <div class="chips">
-        ${act.map(e=>`<div class="chip" data-wi="${wi}" data-id="${e.id}" onclick="togTN(${wi},${e.id},this)">${e.n}</div>`).join('')}
-        <div class="chip cr" onclick="clrSem(${wi})">↺ Limpiar</div>
+        ${act.map(e=>`<div class="chip" data-wi="${wi}" data-leg="${e.leg}" onclick="togTN(${wi},${e.leg},this)">${e.n}</div>`).join('')}
+        <div class="chip cr" onclick="clrS(${wi})">↺ Limpiar</div>
       </div>`;
     c.appendChild(d);
   });
   ir(2);
 }
+function togTN(wi,leg,el){const n=+leg;TN[wi].has(n)?(TN[wi].delete(n),el.classList.remove('on')):(TN[wi].add(n),el.classList.add('on'));}
+function clrS(wi){TN[wi].clear();document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c=>c.classList.remove('on'));}
 
-function togTN(wi,id,el){const n=Number(id);TN[wi].has(n)?(TN[wi].delete(n),el.classList.remove('on')):(TN[wi].add(n),el.classList.add('on'));}
-function clrSem(wi){TN[wi].clear();document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c=>c.classList.remove('on'));}
+// ── Parseo de horario ─────────────────────────────────────────────────────
+function parseH(s){
+  if(!s||s.length<5) return null;
+  const hh=parseInt(s.substring(0,2)),mm=parseInt(s.substring(3,5));
+  if(isNaN(hh)||isNaN(mm)) return null;
+  return hh+mm/60;
+}
+// Devuelve {e:"HH:MM", s:"HH:MM"|null, disp:"HH:MMhh:mm"} o null
+function getTurno(att,day,isTN){
+  const val=(att[day]||'').trim();
+  if(!val) return null;
+  const h0=parseH(val.substring(0,5));
+  if(h0===null) return null;
 
-function getWidx(ds){for(let i=0;i<SEMS.length;i++)if(SEMS[i].dias.some(d=>d.ds===ds))return i;return -1;}
-
-// --- PARSEO ---
-function parseRegs(){
-  if(!rawData||!rawData.length) return {};
-  const keys=Object.keys(rawData[0]);
-  const idc  = getIdCol()  || keys.find(k=>/enroll|userid|no\b|legajo/i.test(k)) || keys[0];
-  const fc   = getFechaCol()|| keys.find(k=>/date|fecha/i.test(k));
-  const hc   = getHoraCol() || keys.find(k=>/time|hora/i.test(k));
-  const nc   = keys.find(k=>/name|nombre/i.test(k));
-
-  const byE={};
-  rawData.forEach(row=>{
-    const id=parseInt(String(row[idc]||'').trim());
-    if(!id||isNaN(id)||EXCL_FIJOS.has(id)) return;
-    const ecfg=EMPS.find(e=>e.id===id);
-    if(!ecfg||ecfg.excl) return;
-
-    // Parsear fecha y hora
-    let dt=null;
-    const fStr=fc?String(row[fc]||'').trim():'';
-    const hStr=hc?String(row[hc]||'').trim():'';
-
-    if(fStr&&hStr){
-      // "DD/MM/YYYY" o "YYYY-MM-DD" + "HH:MM"
-      const fClean=fStr.replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$3-$2-$1').replace(/\//g,'-');
-      dt=new Date(`${fClean}T${hStr.substring(0,5)}`);
-    }else if(fStr){
-      // datetime en una columna: "DD/MM/YYYY HH:MM"
-      const m=fStr.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/);
-      if(m) dt=new Date(`${m[3]}-${m[2]}-${m[1]}T${m[4]}`);
-      else dt=new Date(fStr);
+  if(isTN){
+    if(h0>=18){ // entrada nocturna
+      const e=val.substring(0,5);
+      const nv=(att[day+1]||'').trim();
+      const hn=nv?parseH(nv.substring(0,5)):null;
+      const s=(hn!==null&&hn>=5&&hn<=12)?nv.substring(0,5):null;
+      return {e,s,disp:e+(s||'')};
     }
-    if(!dt||isNaN(dt.getTime())) return;
-
-    const ds=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-    const h=dt.getHours()+dt.getMinutes()/60;
-    if(!byE[id]) byE[id]={id,n:ecfg.n,regs:[]};
-    byE[id].regs.push({ds,h,dt});
-  });
-
-  // Armar turnos
-  Object.values(byE).forEach(emp=>{
-    emp.regs.sort((a,b)=>a.dt-b.dt);
-    emp.t={};
-    const rr=emp.regs; let i=0;
-    while(i<rr.length){
-      const r=rr[i];
-      const inM=r.dt.getMonth()+1===MES&&r.dt.getFullYear()===ANIO;
-      if(!inM){i++;continue;}
-      const wi=getWidx(r.ds);
-      const tn=wi>=0&&TN[wi]&&TN[wi].has(emp.id);
-      if(tn&&r.h>=18){
-        const nx=rr[i+1];
-        if(nx&&nx.h<=12&&(nx.dt-r.dt)<14*3600000){emp.t[r.ds]={e:r.h,s:nx.h+24,tn:true};i+=2;}
-        else{emp.t[r.ds]={e:r.h,s:null,tn:true};i++;}
-      }else if(tn&&r.h<=10){
-        i++;
-      }else{
-        const nx=rr[i+1]; let sal=null;
-        if(nx&&nx.ds===r.ds&&nx.h>r.h){sal=nx.h;i+=2;}
-        else if(nx&&nx.h<r.h&&(nx.dt-r.dt)<14*3600000){sal=nx.h+24;i+=2;}
-        else i++;
-        if(!emp.t[r.ds]) emp.t[r.ds]={e:r.h,s:sal,tn:false};
+    if(h0>=5&&h0<=13&&val.length>=10){ // salida noche anterior + nueva entrada
+      const h1=parseH(val.substring(5,10));
+      if(h1!==null&&h1>=18){
+        const e=val.substring(5,10);
+        const nv=(att[day+1]||'').trim();
+        const hn=nv?parseH(nv.substring(0,5)):null;
+        const s=(hn!==null&&hn>=5&&hn<=12)?nv.substring(0,5):null;
+        return {e,s,disp:e+(s||'')};
       }
     }
-  });
-  return byE;
+    if(h0>=5&&h0<=13&&val.length===5) return null; // salida ya contada
+  }
+
+  const e=val.substring(0,5);
+  const s=val.length>=10?val.substring(val.length-5):null;
+  return {e,s,disp:e+(s||'')};
 }
-
-function fmtH(h){if(h===null||h===undefined)return '--:--';const hh=Math.floor(h%24),mm=Math.round((h%1)*60);return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;}
-
-function calcH(t,tn){
-  if(!t||t.s===null) return {b:0,x:0,tot:0};
-  const w=Math.floor(t.s-t.e); if(w<=0||w>20) return {b:0,x:0,tot:0};
-  const base=tn?10:9;
+function calcH(t,isTN){
+  if(!t||!t.s) return {b:0,x:0,tot:0};
+  let e=parseH(t.e),s=parseH(t.s);
+  if(e===null||s===null) return {b:0,x:0,tot:0};
+  if(s<=e) s+=24;
+  const w=Math.floor(s-e),base=isTN?10:9;
   const x=Math.round(Math.max(0,w-base)*1.5*10)/10;
   return {b:base,x,tot:base+x};
 }
 
-// --- EXCEL ---
-function genExcel(){
-  const empD=parseRegs();
-  const dias=getDiasQ(MES,ANIO,Q);
-  const ql=Q===1?'1Q':'2Q';
-  const titulo=`${MN[MES]} ${ANIO} — ${Q===1?'1° Quincena':'2° Quincena'}`;
-  const fn=`Asistencia_${MN[MES]}_${ANIO}_${ql}.xlsx`;
+// ── Generar y descargar ───────────────────────────────────────────────────
+function generarYDescargar(){
+  const btn=document.getElementById('btnGen');
+  btn.disabled=true; btn.textContent='Generando...';
+  try{
+    const dias=getDias(MES,ANIO,Q);
+    const ql=Q===1?'1Q':'2Q';
+    const qNom=Q===1?'1° Quincena':'2° Quincena';
+    const titulo=`${MN[MES]} ${ANIO} — ${qNom}`;
+    const fn=`Asistencia_${MN[MES]}_${ANIO}_${ql}.xlsx`;
 
-  const wb=XLSX.utils.book_new();
-  const aoa=buildAOA(empD,dias,titulo);
-  const ws=XLSX.utils.aoa_to_sheet(aoa);
+    const wb=XLSX.utils.book_new();
+    const aoa=buildAOA(dias,titulo);
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols']=[{wch:2},{wch:26},...dias.map(()=>({wch:11})),{wch:8}];
+    XLSX.utils.book_append_sheet(wb,ws,qNom);
 
-  // Ancho de columnas
-  const wscols=[{wch:2},{wch:26},...dias.map(()=>({wch:9})),{wch:8}];
-  ws['!cols']=wscols;
+    XLSX.writeFile(wb,fn);
 
-  XLSX.utils.book_append_sheet(wb,ws,Q===1?'1° Quincena':'2° Quincena');
-  XLSX.writeFile(wb,fn);
-
-  lastFN=fn;
-  document.getElementById('btnDL').onclick=()=>XLSX.writeFile(wb,fn);
-  document.getElementById('xlInfo').textContent=`${titulo} — ${EMPS.filter(e=>!e.excl).length} empleados`;
-  renderPrev(empD,dias);
-  ir(3);
+    document.getElementById('btnDL').onclick=()=>XLSX.writeFile(wb,fn);
+    document.getElementById('xlInfo').textContent=`${titulo} — ${EMPS.filter(e=>!e.excl).length} empleados`;
+    renderPrev(dias);
+    ir(3);
+  }catch(err){
+    alert('Error generando Excel: '+err.message);
+    console.error(err);
+  }finally{
+    btn.disabled=false; btn.textContent='⚡ Generar y Descargar Excel';
+  }
 }
 
-function buildAOA(empD,dias,titulo){
-  const DOW=['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
-  const rows=[[titulo],['Empleado',...dias.map(d=>d.d),'TOTAL'],['', ...dias.map(d=>DOW[d.dow]),'']];
-
+function buildAOA(dias,titulo){
+  const rows=[[titulo],['Empleado',...dias.map(d=>d.d),'TOTAL'],['', ...dias.map(d=>DN[d.dow]),'']];
   EMPS.filter(e=>!e.excl).forEach(ecfg=>{
-    const emp=empD[ecfg.id];
-    const rN=[ecfg.n]; const rT=['Turno']; const rH=['Horario'];
-    const rB=['Hs Base']; const rX=['Hs Extra x1.5']; const rTo=['TOTAL'];
-    let sumX=0,sumTot=0,sumB=0;
+    const fe=fileEmps[ecfg.leg];
+    const att=fe?fe.att:{};
+    const rN=[ecfg.n],rT=['Turno'],rH=['Horario'];
+    const rB=['Hs Base'],rX=['Hs Extra x1.5'],rTo=['TOTAL'];
+    let sB=0,sX=0,sT=0;
 
     dias.forEach(dia=>{
       const wi=getWidx(dia.ds);
-      const tn=wi>=0&&TN[wi]&&TN[wi].has(ecfg.id);
-      const turno=emp?(emp.t[dia.ds]||null):null;
+      const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
       const fer=FERIAS.has(dia.ds);
       const we=dia.dow===0||dia.dow===6;
-      rT.push(tn?'TN':'TM');
+      rT.push(isTN?'TN':'TM');
 
-      if(fer&&!turno){
-        rH.push('Feriado'); rB.push(8); rX.push('-'); rTo.push(8);
-        sumB+=8; sumTot+=8;
-      }else if((we||fer)&&turno&&turno.s!==null){
-        const w=Math.floor(turno.s-turno.e); const hs=Math.max(0,w)*2;
-        rH.push(`${fmtH(turno.e)}-${fmtH(turno.s%24)}`);
-        rB.push('-'); rX.push('-'); rTo.push(hs); sumTot+=hs;
-      }else if(turno&&turno.s!==null){
-        const h=calcH(turno,tn);
-        rH.push(`${fmtH(turno.e)}-${fmtH(turno.s%24)}`);
-        rB.push(h.b); rX.push(h.x||'-'); rTo.push(h.tot);
-        sumB+=h.b; sumX+=h.x; sumTot+=h.tot;
-      }else if(turno){
-        rH.push(`${fmtH(turno.e)} (s/s)`); rB.push('-'); rX.push('-'); rTo.push('-');
-      }else{
-        rH.push(''); rB.push(''); rX.push(''); rTo.push('');
+      if(fer){
+        const t=getTurno(att,dia.d,isTN);
+        if(t&&t.s){ // feriado trabajado
+          const h=calcH(t,isTN);
+          rH.push(t.disp);rB.push('-');rX.push('-');rTo.push(h.tot);sT+=h.tot;
+        }else{
+          rH.push('Feriado');rB.push(8);rX.push('-');rTo.push(8);sB+=8;sT+=8;
+        }
+        return;
       }
+      if(we){
+        const t=getTurno(att,dia.d,isTN);
+        if(t&&t.s){
+          let e=parseH(t.e),s=parseH(t.s);
+          if(s<=e)s+=24;
+          const hs=Math.max(0,Math.floor(s-e))*2;
+          rH.push(t.disp);rB.push('-');rX.push('-');rTo.push(hs);sT+=hs;
+        }else{
+          rH.push('');rB.push('');rX.push('');rTo.push('');
+        }
+        return;
+      }
+      const t=getTurno(att,dia.d,isTN);
+      if(!t){rH.push('');rB.push('');rX.push('');rTo.push('');return;}
+      if(!t.s){rH.push(t.e+' s/s');rB.push('-');rX.push('-');rTo.push('-');return;}
+      const h=calcH(t,isTN);
+      rH.push(t.disp);rB.push(h.b);rX.push(h.x||'-');rTo.push(h.tot);
+      sB+=h.b;sX+=h.x;sT+=h.tot;
     });
 
     rN.push(...Array(dias.length).fill(''));
-    rB.push(sumB); rX.push(Math.round(sumX*10)/10||'-'); rTo.push(Math.round(sumTot*10)/10);
+    rB.push(sB);rX.push(Math.round(sX*10)/10||'-');rTo.push(Math.round(sT*10)/10);
     rows.push(rN,rT,rH,rB,rX,rTo,[]);
   });
   return rows;
 }
 
-function renderPrev(empD,dias){
+function renderPrev(dias){
   const act=EMPS.filter(e=>!e.excl);
   let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">Hs Base</th><th class="nr">Hs Extra</th><th class="nr">Total</th><th>Turno</th></tr></thead><tbody>`;
   let tot=0;
   act.forEach(ecfg=>{
-    const emp=empD[ecfg.id];
+    const fe=fileEmps[ecfg.leg];
+    const att=fe?fe.att:{};
     let d=0,b=0,x=0,t=0,hasTN=false;
     dias.forEach(dia=>{
       const wi=getWidx(dia.ds);
-      const tn=wi>=0&&TN[wi]&&TN[wi].has(ecfg.id);
-      if(tn)hasTN=true;
-      if(FERIAS.has(dia.ds)&&!(emp&&emp.t[dia.ds])){t+=8;b+=8;return;}
-      if(!emp)return;
-      const tr=emp.t[dia.ds];
-      if(tr&&tr.s!==null){d++;const h2=calcH(tr,tn);b+=h2.b;x+=h2.x;t+=h2.tot;}
+      const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
+      if(isTN)hasTN=true;
+      if(FERIAS.has(dia.ds)&&!att[dia.d]){b+=8;t+=8;return;}
+      const tr=getTurno(att,dia.d,isTN);
+      if(tr&&tr.s){d++;const h2=calcH(tr,isTN);b+=h2.b;x+=h2.x;t+=h2.tot;}
     });
     tot+=t;
-    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.id}</td><td class="nr">${d}</td><td class="nr">${b}</td><td class="nr">${Math.round(x*10)/10}</td><td class="nr fw">${Math.round(t*10)/10}</td><td><span class="bx ${hasTN?'btn2':'btm'}">${hasTN?'TN':'TM'}</span></td></tr>`;
+    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr">${b}</td><td class="nr">${Math.round(x*10)/10}</td><td class="nr fw">${Math.round(t*10)/10}</td><td><span class="bx ${hasTN?'btn2':'btm'}">${hasTN?'TN':'TM'}</span></td></tr>`;
   });
   h+=`</tbody><tfoot><tr><td colspan="5">TOTAL PLANTEL</td><td class="nr">${Math.round(tot*10)/10}</td><td></td></tr></tfoot></table>`;
   document.getElementById('prevTbl').innerHTML=h;
