@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winflex — Asistencia</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --card: #1c2128;
+  --border: #30363d;
+  --accent: #1f6feb;
+  --accent-glow: rgba(31,111,235,0.15);
+  --green: #2ea043;
+  --green-glow: rgba(46,160,67,0.15);
+  --orange: #e3b341;
+  --orange-glow: rgba(227,179,65,0.15);
+  --red: #f85149;
+  --text: #e6edf3;
+  --text-dim: #7d8590;
+  --text-muted: #484f58;
+  --radius: 10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:52px;gap:16px}
+.hdr-logo{font-size:16px;font-weight:700;letter-spacing:.5px;color:var(--text)}
+.hdr-logo span{color:var(--accent)}
+.hdr-steps{display:flex;gap:0;margin-left:auto}
+.hdr-step{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:6px;color:var(--text-muted);font-size:12px;font-weight:500;transition:.2s}
+.hdr-step.active{background:var(--accent-glow);color:var(--accent)}
+.hdr-step.done{color:var(--green)}
+.step-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.step-dot .check{display:none}
+.hdr-step.done .step-dot .num{display:none}
+.hdr-step.done .step-dot .check{display:block}
+
+/* LAYOUT */
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.card-hd{font-weight:600;font-size:14px;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-hd .icon{font-size:16px}
+
+/* UPLOAD */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--surface)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-glow)}
+.drop-zone .dz-icon{font-size:40px;margin-bottom:12px}
+.drop-zone p{color:var(--text-dim);line-height:1.6}
+.drop-zone strong{color:var(--accent)}
+
+/* FORM */
+.row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.fg{display:flex;flex-direction:column;gap:6px;flex:1;min-width:130px}
+.fg label{font-size:12px;color:var(--text-dim);font-weight:500}
+select,input[type=number],input[type=text]{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;transition:.2s;width:100%}
+select:focus,input:focus{border-color:var(--accent)}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#1a5cbb}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#238636}
+.btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-lg{padding:13px 28px;font-size:15px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* STATUS */
+.status{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:8px;font-size:13px;margin-top:12px;border:1px solid transparent}
+.status.ok{background:var(--green-glow);border-color:rgba(46,160,67,.3);color:var(--green)}
+.status.err{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--red)}
+.status.info{background:var(--accent-glow);border-color:rgba(31,111,235,.3);color:var(--accent)}
+
+/* WEEK CARDS */
+.weeks-grid{display:flex;flex-direction:column;gap:12px}
+.week-block{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px 16px}
+.week-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.week-label span{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:2px 8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:.15s;background:var(--card);color:var(--text-dim);user-select:none}
+.chip:hover{border-color:var(--orange);color:var(--orange)}
+.chip.on{border-color:var(--orange);background:var(--orange-glow);color:var(--orange);font-weight:600}
+
+/* PREVIEW TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--surface);padding:9px 12px;text-align:left;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-tm{background:var(--accent-glow);color:var(--accent)}
+.badge-tn{background:var(--orange-glow);color:var(--orange)}
+.num{text-align:right}
+
+/* EMP EDITOR */
+.emp-row{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.emp-row:last-child{border-bottom:none}
+.emp-id{font-size:11px;color:var(--text-muted);width:30px;flex-shrink:0}
+.emp-name{flex:1}
+.emp-excl{cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-dim)}
+.emp-excl.excl{border-color:var(--red);color:var(--red)}
+
+/* SUCCESS */
+.success-box{text-align:center;padding:40px}
+.success-box .s-icon{font-size:56px;margin-bottom:12px}
+.success-box h2{font-size:22px;margin-bottom:6px}
+.success-box p{color:var(--text-dim);margin-bottom:24px}
+
+.hidden{display:none!important}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.small{font-size:12px;color:var(--text-dim)}
+.bold{font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">WINFLEX <span>| Asistencia</span></div>
+  <div class="hdr-steps">
+    <div class="hdr-step active" id="s1b">
+      <div class="step-dot"><span class="num">1</span><span class="check">✓</span></div> Cargar
+    </div>
+    <div class="hdr-step" id="s2b">
+      <div class="step-dot"><span class="num">2</span><span class="check">✓</span></div> Turno Noche
+    </div>
+    <div class="hdr-step" id="s3b">
+      <div class="step-dot"><span class="num">3</span><span class="check">✓</span></div> Descargar
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== STEP 1 ===== -->
+  <div id="pg1">
+    <div class="card">
+      <div class="card-hd"><span class="icon">📂</span> Archivo del reloj biométrico</div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fi').click()">
+        <div class="dz-icon">📋</div>
+        <p><strong>Clic para seleccionar</strong> o arrastrar el archivo aquí</p>
+        <p class="small" style="margin-top:6px">Formato: 1_report.xls (exportación del reloj)</p>
+      </div>
+      <input type="file" id="fi" accept=".xls,.xlsx,.csv" style="display:none">
+      <div id="fileStatus" class="hidden"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="icon">📅</span> Período</div>
+      <div class="row">
+        <div class="fg">
+          <label>Mes</label>
+          <select id="selMes">
+            <option value="1">Enero</option><option value="2">Febrero</option>
+            <option value="3">Marzo</option><option value="4">Abril</option>
+            <option value="5">Mayo</option><option value="6">Junio</option>
+            <option value="7">Julio</option><option value="8">Agosto</option>
+            <option value="9">Septiembre</option><option value="10">Octubre</option>
+            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Año</label>
+          <input type="number" id="inpAnio" value="2026" min="2024" max="2030">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="icon">👥</span> Empleados activos</div>
+      <p class="small" style="margin-bottom:14px">Editá nombres o excluí temporalmente. Los cambios se aplican solo a este reporte.</p>
+      <div id="empEditor"></div>
+    </div>
+
+    <button class="btn btn-primary btn-lg" onclick="goStep2()">Continuar →</button>
+  </div>
+
+  <!-- ===== STEP 2 ===== -->
+  <div id="pg2" class="hidden">
+    <div class="card">
+      <div class="card-hd"><span class="icon">🌙</span> Turno Noche por semana</div>
+      <p class="small" style="margin-bottom:16px">Seleccioná los empleados que estuvieron de turno noche en cada semana. Cada uno suma +1hs bonus por día trabajado.</p>
+      <div class="weeks-grid" id="weeksContainer"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Atrás</button>
+      <button class="btn btn-primary" onclick="generarExcel()">⚡ Generar Excel</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 3 ===== -->
+  <div id="pg3" class="hidden">
+    <div class="card">
+      <div class="success-box">
+        <div class="s-icon">✅</div>
+        <h2>Excel generado</h2>
+        <p id="excelInfo">Listo para descargar</p>
+        <button class="btn btn-success btn-lg" id="btnDL">⬇️ Descargar Excel</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><span class="icon">📊</span> Resumen por empleado</div>
+      <div class="tbl-wrap" id="previewTbl"></div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Nuevo reporte</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ==================== CONFIGURACIÓN ====================
+let EMPLEADOS = {
+  4:  { nombre: "Juan Brest", excl: false },
+  5:  { nombre: "Juan Vera", excl: false },
+  6:  { nombre: "Fernando Moreno", excl: false },
+  7:  { nombre: "Alan Vera", excl: false },
+  8:  { nombre: "Alejandro Delelis", excl: false },
+  10: { nombre: "Gabriel Luna", excl: false },
+  11: { nombre: "Alan Rodriguez", excl: false },
+  12: { nombre: "Carlos Rodriguez", excl: false },
+  13: { nombre: "Josean Tozayas", excl: false },
+  14: { nombre: "Matías Delelis", excl: false },
+  19: { nombre: "Silvina Silva", excl: false },
+  20: { nombre: "Jorge Ferreira", excl: false },
+  21: { nombre: "Juanmanuel Delgado", excl: false },
+};
+const EXCLUIDOS_FIJOS = new Set([1, 15, 16, 50, 10000]);
+
+const FERIADOS = new Set([
+  // 2025
+  "2025-01-01","2025-03-03","2025-03-04","2025-03-24","2025-04-02",
+  "2025-04-17","2025-04-18","2025-05-01","2025-05-25","2025-06-16",
+  "2025-07-09","2025-08-17","2025-10-12","2025-11-21","2025-12-08","2025-12-25",
+  // 2026
+  "2026-01-01","2026-02-16","2026-02-17","2026-03-24","2026-04-02",
+  "2026-04-03","2026-04-14","2026-04-15","2026-05-01","2026-05-25",
+  "2026-06-15","2026-07-09","2026-08-17","2026-10-12","2026-11-20",
+  "2026-12-08","2026-12-25",
+]);
+
+// ==================== STATE ====================
+let rawData = null;
+let semanas = [];
+let tnPorSemana = {};
+let mes, anio;
+let wbFinal = null;
+let filenameFinal = '';
+
+// ==================== INIT ====================
+const now = new Date();
+document.getElementById('selMes').value = now.getMonth() + 1;
+document.getElementById('inpAnio').value = now.getFullYear();
+renderEmpEditor();
+
+// ==================== NAVEGACIÓN ====================
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`pg${i}`).classList.toggle('hidden', i !== n);
+    const b = document.getElementById(`s${i}b`);
+    b.className = 'hdr-step' + (i === n ? ' active' : i < n ? ' done' : '');
+  });
+  window.scrollTo(0,0);
+}
+
+// ==================== EDITOR DE EMPLEADOS ====================
+function renderEmpEditor() {
+  const container = document.getElementById('empEditor');
+  container.innerHTML = Object.entries(EMPLEADOS).map(([id, e]) => `
+    <div class="emp-row">
+      <div class="emp-id">#${id}</div>
+      <input class="emp-name" type="text" value="${e.nombre}" onchange="EMPLEADOS[${id}].nombre=this.value" style="background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:5px 9px;color:var(--text);font-size:13px">
+      <button class="emp-excl ${e.excl?'excl':''}" onclick="toggleExcl(${id},this)">${e.excl ? '✕ Excluido' : 'Incluir'}</button>
+    </div>
+  `).join('');
+}
+
+function toggleExcl(id, btn) {
+  EMPLEADOS[id].excl = !EMPLEADOS[id].excl;
+  btn.textContent = EMPLEADOS[id].excl ? '✕ Excluido' : 'Incluir';
+  btn.classList.toggle('excl', EMPLEADOS[id].excl);
+}
+
+// ==================== CARGA DE ARCHIVO ====================
+const dropZone = document.getElementById('dropZone');
+const fi = document.getElementById('fi');
+
+fi.addEventListener('change', e => { if(e.target.files[0]) cargarArchivo(e.target.files[0]); });
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag');
+  if(e.dataTransfer.files[0]) cargarArchivo(e.dataTransfer.files[0]);
+});
+
+function cargarArchivo(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type:'binary', cellDates:true, raw:false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rawData = XLSX.utils.sheet_to_json(ws, { raw:false, defval:'' });
+      
+      // Detect unknown employees
+      detectarEmpleados(rawData);
+
+      setStatus('ok', `✅ ${file.name} — ${rawData.length} registros encontrados`);
+      dropZone.style.opacity = '.5';
+    } catch(err) {
+      setStatus('err', `❌ Error leyendo el archivo: ${err.message}`);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('fileStatus');
+  el.className = `status ${type}`;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function detectarEmpleados(data) {
+  if (!data || !data.length) return;
+  const keys = Object.keys(data[0]);
+  const idCol = keys.find(k => /enroll|userid|user.?id|id.?no|legajo/i.test(k)) || keys[0];
+  const nameCol = keys.find(k => /name|nombre/i.test(k));
+  
+  const found = new Set();
+  data.forEach(row => {
+    const id = parseInt(String(row[idCol]||'').trim());
+    if (!id || isNaN(id) || EXCLUIDOS_FIJOS.has(id)) return;
+    if (!EMPLEADOS[id] && !found.has(id)) {
+      found.add(id);
+      const nombre = nameCol ? String(row[nameCol]||'').trim() : `ID ${id}`;
+      EMPLEADOS[id] = { nombre: nombre || `ID ${id}`, excl: false };
+    }
+  });
+  
+  if (found.size > 0) renderEmpEditor();
+}
+
+// ==================== STEP 2: SEMANAS + TN ====================
+function getDiasDelMes(m, y) {
+  const dias = [];
+  const n = new Date(y, m, 0).getDate();
+  for (let d = 1; d <= n; d++) {
+    const dt = new Date(y, m-1, d);
+    const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    dias.push({ d, dateStr, dow: dt.getDay() });
+  }
+  return dias;
+}
+
+function calcSemanas(m, y) {
+  const dias = getDiasDelMes(m, y);
+  const weeks = [];
+  let cur = null;
+  dias.forEach(dia => {
+    const wd = dia.dow === 0 ? 7 : dia.dow; // 1=Lun ... 7=Dom
+    if (wd === 1 || !cur) { if(cur) weeks.push(cur); cur = { dias:[] }; }
+    cur.dias.push(dia);
+  });
+  if (cur && cur.dias.length) weeks.push(cur);
+  
+  const MESES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  weeks.forEach((w, i) => {
+    const f = w.dias[0], l = w.dias[w.dias.length-1];
+    w.label = `Sem. ${i+1} — ${f.d} al ${l.d} de ${MESES[m]}`;
+    w.idx = i;
+  });
+  return weeks;
+}
+
+function goStep2() {
+  mes = parseInt(document.getElementById('selMes').value);
+  anio = parseInt(document.getElementById('inpAnio').value);
+  
+  if (!rawData) {
+    alert('⚠️ Primero seleccioná el archivo del reloj.');
+    return;
+  }
+  
+  semanas = calcSemanas(mes, anio);
+  tnPorSemana = {};
+  
+  const empActivos = Object.entries(EMPLEADOS).filter(([,e]) => !e.excl);
+  const container = document.getElementById('weeksContainer');
+  container.innerHTML = '';
+  
+  semanas.forEach((sem, wi) => {
+    tnPorSemana[wi] = new Set();
+    const div = document.createElement('div');
+    div.className = 'week-block';
+    div.innerHTML = `
+      <div class="week-label"><span>${sem.label}</span></div>
+      <div class="chips">
+        ${empActivos.map(([id, e]) => `
+          <div class="chip" data-wi="${wi}" data-id="${id}" onclick="toggleTN(${wi},${id},this)">${e.nombre}</div>
+        `).join('')}
+        <div class="chip" style="color:var(--text-muted);border-style:dashed" onclick="toggleTNNinguno(${wi})">Ninguno (TM todos)</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  
+  goStep(2);
+}
+
+function toggleTN(wi, id, el) {
+  if (tnPorSemana[wi].has(Number(id))) {
+    tnPorSemana[wi].delete(Number(id));
+    el.classList.remove('on');
+  } else {
+    tnPorSemana[wi].add(Number(id));
+    el.classList.add('on');
+  }
+}
+
+function toggleTNNinguno(wi) {
+  tnPorSemana[wi].clear();
+  document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c => c.classList.remove('on'));
+}
+
+// ==================== PARSEO DE REGISTROS ====================
+function parsearRegistros() {
+  if (!rawData || !rawData.length) return {};
+  const keys = Object.keys(rawData[0]);
+  
+  // Detectar columnas
+  const idCol = keys.find(k => /enroll|userid|user.?id|id.?no|no\b|legajo/i.test(k)) || keys[0];
+  const nameCol = keys.find(k => /name|nombre/i.test(k));
+  const dtCol = keys.find(k => /datetime|fecha.*hora|date.*time/i.test(k));
+  const dateCol = keys.find(k => /\bdate\b|\bfecha\b/i.test(k) && !/time/i.test(k));
+  const timeCol = keys.find(k => /\btime\b|\bhora\b/i.test(k) && !/date/i.test(k));
+  
+  const byEmp = {};
+  
+  rawData.forEach(row => {
+    const id = parseInt(String(row[idCol]||'').trim());
+    if (!id || isNaN(id)) return;
+    if (EXCLUIDOS_FIJOS.has(id)) return;
+    if (EMPLEADOS[id] && EMPLEADOS[id].excl) return;
+    
+    // Parse datetime
+    let dt = null;
+    if (dtCol && row[dtCol]) {
+      dt = new Date(String(row[dtCol]).trim());
+    } else if (dateCol && timeCol && row[dateCol]) {
+      const ds = String(row[dateCol]).trim();
+      const ts = String(row[timeCol]||'00:00').trim();
+      dt = new Date(`${ds} ${ts}`);
+    } else if (dateCol && row[dateCol]) {
+      dt = new Date(String(row[dateCol]).trim());
+    }
+    
+    if (!dt || isNaN(dt.getTime())) return;
+    
+    const dateKey = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    const hora = dt.getHours() + dt.getMinutes()/60;
+    
+    if (!byEmp[id]) {
+      const nombre = nameCol && row[nameCol] 
+        ? String(row[nameCol]).trim() 
+        : (EMPLEADOS[id] ? EMPLEADOS[id].nombre : `ID ${id}`);
+      byEmp[id] = { id, nombre, registros: [] };
+    }
+    byEmp[id].registros.push({ dateKey, hora, dt });
+  });
+  
+  // Ahora agrupar en turnos (manejar TN que cruza medianoche)
+  Object.values(byEmp).forEach(emp => {
+    emp.registros.sort((a,b) => a.dt - b.dt);
+    emp.turnos = {}; // dateKey -> { entrada, salida } (de la jornada)
+    
+    const regs = emp.registros;
+    let i = 0;
+    while (i < regs.length) {
+      const r = regs[i];
+      // Determinar si este registro es del mes seleccionado o adyacente
+      const enMes = r.dt.getMonth()+1 === mes && r.dt.getFullYear() === anio;
+      const mesPrev = r.dt.getMonth()+1 === (mes===1?12:mes-1) && r.dt.getFullYear() === (mes===1?anio-1:anio);
+      
+      if (enMes) {
+        // Determinar semana y si es TN
+        const wi = getWeekIdx(r.dateKey);
+        const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(emp.id);
+        
+        if (esTN && r.hora >= 18) {
+          // Entrada de turno noche: buscar salida siguiente dia
+          const nextReg = regs[i+1];
+          const entrada = r.hora;
+          let salida = null;
+          if (nextReg && nextReg.hora <= 12 && (nextReg.dt - r.dt) < 14*3600000) {
+            salida = nextReg.hora + 24; // normalizar cruzando medianoche
+            i += 2;
+          } else {
+            salida = null; // sin salida
+            i++;
+          }
+          emp.turnos[r.dateKey] = { entrada, salida, esTN: true };
+        } else if (esTN && r.hora <= 10) {
+          // Salida de turno noche del dia anterior — salteamos (ya fue contada)
+          i++;
+        } else {
+          // Turno dia normal: tomar par entrada/salida
+          const entrada = r.hora;
+          const nextReg = regs[i+1];
+          let salida = null;
+          if (nextReg && nextReg.dateKey === r.dateKey && nextReg.hora > entrada) {
+            salida = nextReg.hora;
+            i += 2;
+          } else if (nextReg && nextReg.hora < entrada && (nextReg.dt - r.dt) < 14*3600000) {
+            // Probablemente salida de medianoche (caso raro TM)
+            salida = nextReg.hora + 24;
+            i += 2;
+          } else {
+            i++;
+          }
+          if (!emp.turnos[r.dateKey]) {
+            emp.turnos[r.dateKey] = { entrada, salida, esTN: false };
+          }
+        }
+      } else {
+        i++;
+      }
+    }
+  });
+  
+  return byEmp;
+}
+
+// ==================== HELPERS ====================
+function getWeekIdx(dateStr) {
+  for (let i = 0; i < semanas.length; i++) {
+    if (semanas[i].dias.some(d => d.dateStr === dateStr)) return i;
+  }
+  return -1;
+}
+
+function fmtHora(h) {
+  if (h === null || h === undefined) return '--:--';
+  const hh = Math.floor(h % 24);
+  const mm = Math.round((h % 1) * 60);
+  return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+}
+
+function calcHoras(turno) {
+  if (!turno || turno.salida === null) return { base:0, extra:0, total:0, worked:0 };
+  const worked = Math.floor(turno.salida - turno.entrada); // truncar minutos
+  if (worked <= 0 || worked > 20) return { base:0, extra:0, total:0, worked:0 };
+  const base = turno.esTN ? 10 : 9;
+  const extraHs = Math.max(0, worked - base);
+  const extra15 = Math.round(extraHs * 1.5 * 10) / 10;
+  const total = base + extra15;
+  return { base, extra: extra15, total, worked };
+}
+
+// ==================== GENERAR EXCEL ====================
+function generarExcel() {
+  const empData = parsearRegistros();
+  const dias = getDiasDelMes(mes, anio);
+  const MESES_N = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const mesNombre = MESES_N[mes];
+  
+  const wb = XLSX.utils.book_new();
+  
+  // Mensual
+  const wsMens = buildSheet(empData, dias, mesNombre);
+  XLSX.utils.book_append_sheet(wb, wsMens, 'Mensual');
+  
+  // Quincenas
+  const d1 = dias.filter(d => d.d <= 15);
+  const d2 = dias.filter(d => d.d > 15);
+  const wsQ = XLSX.utils.aoa_to_sheet([]);
+  const aoa1 = buildAOA(empData, d1, `${mesNombre} — 1° Quincena`);
+  const aoa2 = buildAOA(empData, d2, `${mesNombre} — 2° Quincena`);
+  const wsQ2 = XLSX.utils.aoa_to_sheet([...aoa1, [''], ...aoa2]);
+  XLSX.utils.book_append_sheet(wb, wsQ2, 'Quincena');
+  
+  filenameFinal = `Asistencia_${mesNombre}_${anio}.xlsx`;
+  wbFinal = wb;
+  
+  document.getElementById('btnDL').onclick = () => XLSX.writeFile(wb, filenameFinal);
+  document.getElementById('excelInfo').textContent = `${mesNombre} ${anio} — ${Object.keys(empData).length} empleados`;
+  
+  renderPreview(empData, dias);
+  XLSX.writeFile(wb, filenameFinal);
+  goStep(3);
+}
+
+function buildAOA(empData, dias, titulo) {
+  const DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const rows = [];
+  
+  // Título
+  rows.push([titulo]);
+  // Header días
+  rows.push(['Empleado', ...dias.map(d => d.d), 'TOTAL']);
+  // Header DOW
+  rows.push(['', ...dias.map(d => DOW[d.dow]), '']);
+  
+  const empActivos = Object.entries(EMPLEADOS).filter(([,e]) => !e.excl);
+  
+  empActivos.forEach(([idStr, ecfg]) => {
+    const id = parseInt(idStr);
+    const emp = empData[id];
+    const nombre = emp ? emp.nombre : ecfg.nombre;
+    
+    const rNom  = [nombre];
+    const rTur  = ['Turno'];
+    const rHor  = ['Horario'];
+    const rBase = ['Hs. Base'];
+    const rExt  = ['Hs. Extra x1.5'];
+    const rTot  = ['TOTAL'];
+    
+    let totBase=0, totExt=0, totTot=0;
+    
+    dias.forEach(dia => {
+      const wi = getWeekIdx(dia.dateStr);
+      const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(id);
+      const turno = emp ? (emp.turnos[dia.dateStr] || null) : null;
+      const feriado = FERIADOS.has(dia.dateStr);
+      const weekend = dia.dow === 0 || dia.dow === 6;
+      
+      rTur.push(esTN ? 'TN' : 'TM');
+      
+      if (feriado && !turno) {
+        // Feriado sin presentarse
+        rHor.push('Feriado');
+        rBase.push(8); rExt.push(0); rTot.push(8);
+        totBase+=8; totTot+=8;
+      } else if ((weekend || feriado) && turno && turno.salida !== null) {
+        // Fin de semana / feriado con fichaje → horas x2
+        const worked = Math.floor(turno.salida - turno.entrada);
+        const hs = worked > 0 ? worked * 2 : 0;
+        rHor.push(`${fmtHora(turno.entrada)}-${fmtHora(turno.salida % 24)}`);
+        rBase.push(0); rExt.push(0); rTot.push(hs);
+        totTot+=hs;
+      } else if (turno && turno.salida !== null) {
+        // Día normal trabajado
+        const h = calcHoras({ ...turno, esTN });
+        rHor.push(`${fmtHora(turno.entrada)}-${fmtHora(turno.salida % 24)}`);
+        rBase.push(h.base); rExt.push(h.extra); rTot.push(h.total);
+        totBase+=h.base; totExt+=h.extra; totTot+=h.total;
+      } else if (turno && turno.salida === null) {
+        // Solo entrada
+        rHor.push(`${fmtHora(turno.entrada)} (sin sal.)`);
+        rBase.push(0); rExt.push(0); rTot.push(0);
+      } else {
+        // No vino
+        rHor.push(''); rBase.push(''); rExt.push(''); rTot.push('');
+      }
+    });
+    
+    rNom.push(...Array(dias.length).fill(''));
+    rBase.push(totBase);
+    rExt.push(Math.round(totExt*10)/10);
+    rTot.push(Math.round(totTot*10)/10);
+    
+    rows.push(rNom, rTur, rHor, rBase, rExt, rTot, []);
+  });
+  
+  return rows;
+}
+
+function buildSheet(empData, dias, titulo) {
+  const aoa = buildAOA(empData, dias, titulo);
+  return XLSX.utils.aoa_to_sheet(aoa);
+}
+
+// ==================== PREVIEW ====================
+function renderPreview(empData, dias) {
+  const empActivos = Object.entries(EMPLEADOS).filter(([,e]) => !e.excl);
+  let html = `<table>
+    <thead><tr>
+      <th>Empleado</th><th class="num">Días trab.</th>
+      <th class="num">Hs. Base</th><th class="num">Hs. Extra</th>
+      <th class="num">Total Horas</th><th>Turno</th>
+    </tr></thead><tbody>`;
+  
+  let totalGlobal = 0;
+  
+  empActivos.forEach(([idStr, ecfg]) => {
+    const id = parseInt(idStr);
+    const emp = empData[id];
+    let diasTrab=0, hsBase=0, hsExt=0, hsTot=0;
+    let tieneTN = false;
+    
+    dias.forEach(dia => {
+      const wi = getWeekIdx(dia.dateStr);
+      const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(id);
+      if (esTN) tieneTN = true;
+      if (!emp) return;
+      
+      const turno = emp.turnos[dia.dateStr];
+      if (turno && turno.salida !== null) {
+        diasTrab++;
+        const h = calcHoras({ ...turno, esTN });
+        hsBase+=h.base; hsExt+=h.extra; hsTot+=h.total;
+      }
+      // Feriados sin fichaje
+      if (FERIADOS.has(dia.dateStr) && !turno) {
+        hsTot += 8; hsBase += 8;
+      }
+    });
+    
+    totalGlobal += hsTot;
+    html += `<tr>
+      <td><strong>${ecfg.nombre}</strong></td>
+      <td class="num">${diasTrab}</td>
+      <td class="num">${hsBase}</td>
+      <td class="num">${Math.round(hsExt*10)/10}</td>
+      <td class="num bold">${Math.round(hsTot*10)/10}</td>
+      <td><span class="badge ${tieneTN?'badge-tn':'badge-tm'}">${tieneTN?'TN':'TM'}</span></td>
+    </tr>`;
+  });
+  
+  html += `</tbody><tfoot>
+    <tr style="background:var(--surface)">
+      <td colspan="4" style="font-weight:600;color:var(--text-dim)">TOTAL PLANTEL</td>
+      <td class="num bold">${Math.round(totalGlobal*10)/10}</td><td></td>
+    </tr></tfoot></table>`;
+  
+  document.getElementById('previewTbl').innerHTML = html;
+}
+</script>
+</body>
+</html>
