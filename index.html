@@ -4,43 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Winflex — Asistencia</title>
+<!-- SheetJS para LEER el XLS del reloj -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- ExcelJS para GENERAR el Excel formateado -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
 <style>
-:root {
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --card2: #f8f9fb;
-  --border: #dde1e7;
-  --accent: #1a56e8;
-  --accent-light: #edf2fe;
-  --green: #0e7a3c;
-  --green-light: #edfaf2;
-  --orange: #c4620a;
-  --orange-light: #fff4e8;
-  --red: #c8291e;
-  --red-light: #fef2f1;
-  --text: #1a1f36;
-  --text-dim: #5a6072;
-  --text-muted: #9aa0b0;
-  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
-  --radius: 10px;
-}
+:root{--bg:#f0f2f5;--surface:#fff;--card:#fff;--card2:#f8f9fb;--border:#dde1e7;--accent:#1a56e8;--accent-light:#edf2fe;--green:#0e7a3c;--green-light:#edfaf2;--orange:#c4620a;--orange-light:#fff4e8;--red:#c8291e;--red-light:#fef2f1;--text:#1a1f36;--text-dim:#5a6072;--text-muted:#9aa0b0;--shadow:0 1px 3px rgba(0,0,0,.08);--r:10px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 .hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:54px;gap:16px;box-shadow:var(--shadow)}
-.hdr-logo{font-size:15px;font-weight:700;color:var(--text)}
-.hdr-logo em{color:var(--accent);font-style:normal}
+.hdr-logo{font-size:15px;font-weight:700;color:var(--text)}.hdr-logo em{color:var(--accent);font-style:normal}
 .hdr-steps{display:flex;align-items:center;gap:2px;margin-left:auto}
 .hdr-step{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:6px;color:var(--text-muted);font-size:12px;font-weight:500;transition:.18s}
 .hdr-step.active{background:var(--accent-light);color:var(--accent);font-weight:600}
 .hdr-step.done{color:var(--green)}
 .step-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
 .hdr-sep{width:20px;height:1px;background:var(--border)}
-.wrap{max-width:960px;margin:0 auto;padding:26px 18px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow)}
+.wrap{max-width:980px;margin:0 auto;padding:26px 18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-hd{font-weight:600;font-size:14px;margin-bottom:16px;color:var(--text)}
-.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:36px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--card2)}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--card2)}
 .drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-light)}
 .drop-zone .dz-icon{font-size:38px;margin-bottom:10px}
 .drop-zone p{color:var(--text-dim);line-height:1.6}
@@ -49,9 +32,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .fg{display:flex;flex-direction:column;gap:6px}
 .fg label{font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 select,input[type=number]{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-size:14px;outline:none;transition:.18s}
-select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,232,.1)}
+select:focus,input:focus{border-color:var(--accent)}
 .quinc-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
-.quinc-opt{flex:1;padding:9px 16px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-dim);background:var(--surface);transition:.15s;border:none;outline:none;white-space:nowrap}
+.quinc-opt{flex:1;padding:9px 14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-dim);background:var(--surface);transition:.15s;border:none;outline:none;white-space:nowrap}
 .quinc-opt:first-child{border-right:1px solid var(--border)}
 .quinc-opt.sel{background:var(--accent);color:#fff}
 .quinc-opt:not(.sel):hover{background:var(--accent-light);color:var(--accent)}
@@ -66,6 +49,7 @@ select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26
 .status{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;border:1px solid transparent}
 .status.ok{background:var(--green-light);border-color:rgba(14,122,60,.2);color:var(--green)}
 .status.err{background:var(--red-light);border-color:rgba(200,41,30,.2);color:var(--red)}
+.status.warn{background:#fff8e1;border-color:#f0c040;color:#7a5800}
 .emp-list{display:flex;flex-direction:column}
 .emp-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
 .emp-row:last-child{border-bottom:none}
@@ -91,7 +75,7 @@ td{padding:8px 12px;border-bottom:1px solid var(--border)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#f5f6f9}
 tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--border)}
-.num{text-align:right}
+.num{text-align:right}.fw7{font-weight:700}
 .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
 .badge-tm{background:var(--accent-light);color:var(--accent)}
 .badge-tn{background:var(--orange-light);color:var(--orange)}
@@ -101,7 +85,9 @@ tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--bord
 .success-box .sub{color:var(--text-dim);margin-bottom:22px}
 .hidden{display:none!important}
 .small{font-size:12px;color:var(--text-dim)}
-.fw7{font-weight:700}
+.loading{text-align:center;padding:32px;color:var(--text-dim)}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -119,15 +105,16 @@ tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--bord
 
 <div class="wrap">
 
+  <!-- PASO 1 -->
   <div id="pg1">
     <div class="card">
       <div class="card-hd">📂 Archivo del reloj biométrico</div>
       <div class="drop-zone" id="dropZone" onclick="document.getElementById('fi').click()">
         <div class="dz-icon">📋</div>
         <p><strong>Clic para seleccionar</strong> o arrastrar el archivo aquí</p>
-        <p class="small" style="margin-top:5px">Formato: 1_report.xls — exportación del reloj</p>
+        <p class="small" style="margin-top:5px">Formato: 1_report.xls — exportación del reloj (hoja "Reporte de Asistencia")</p>
       </div>
-      <input type="file" id="fi" accept=".xls,.xlsx,.csv" style="display:none">
+      <input type="file" id="fi" accept=".xls,.xlsx" style="display:none">
       <div id="fileStatus" class="hidden"></div>
     </div>
 
@@ -162,36 +149,38 @@ tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--bord
 
     <div class="card">
       <div class="card-hd">👥 Nómina de empleados</div>
-      <p class="small" style="margin-bottom:14px">Editá nombres o marcá como excluido para omitir del reporte.</p>
+      <p class="small" style="margin-bottom:14px">Editá nombres o marcá como excluido para omitirlo de este reporte.</p>
       <div class="emp-list" id="empEditor"></div>
     </div>
 
     <button class="btn btn-primary btn-lg" onclick="goStep2()">Continuar →</button>
   </div>
 
+  <!-- PASO 2 -->
   <div id="pg2" class="hidden">
     <div class="card">
       <div class="card-hd">🌙 Turno Noche — <span id="pgdLabel" style="color:var(--text-dim);font-weight:400;font-size:13px"></span></div>
-      <p class="small" style="margin-bottom:16px">Seleccioná quién estuvo de noche en cada semana. El turno noche suma +1 hs bonus por día trabajado.</p>
+      <p class="small" style="margin-bottom:16px">Seleccioná quién estuvo de noche en cada semana. El turno noche suma +1 hs base por día trabajado.</p>
       <div class="weeks-list" id="weeksContainer"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn btn-ghost" onclick="goStep(1)">← Atrás</button>
-      <button class="btn btn-primary" onclick="generarExcel()">⚡ Generar Excel</button>
+      <button class="btn btn-primary" id="btnGenerar" onclick="generarExcel()">⚡ Generar Excel</button>
     </div>
   </div>
 
+  <!-- PASO 3 -->
   <div id="pg3" class="hidden">
     <div class="card">
       <div class="success-box">
         <div class="s-ico">✅</div>
-        <h2>Excel listo</h2>
+        <h2>Excel generado</h2>
         <div class="sub" id="excelInfo"></div>
         <button class="btn btn-success btn-lg" id="btnDL">⬇️ Volver a descargar</button>
       </div>
     </div>
     <div class="card">
-      <div class="card-hd">📊 Resumen por empleado</div>
+      <div class="card-hd">📊 Resumen del período</div>
       <div class="tbl-wrap" id="previewTbl"></div>
     </div>
     <div style="margin-top:14px">
@@ -202,6 +191,9 @@ tfoot td{background:var(--card2);font-weight:700;border-top:2px solid var(--bord
 </div>
 
 <script>
+// ============================================================
+// DATOS FIJOS
+// ============================================================
 const EMPLEADOS_DEF = [
   { id: 3,  nombre: "Brest Juan Andrés" },
   { id: 20, nombre: "Luna Gabriel Ignacio" },
@@ -230,17 +222,44 @@ const FERIADOS = new Set([
   "2026-12-08","2026-12-25",
 ]);
 
-const MESES_N = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DOW_NOM = ['DOM.','LUN.','MAR.','MIE.','JUE.','VIE.','SAB.'];
 
+// Colores Excel (ARGB)
+const CLR = {
+  headerDia:  'FF2E75B6',  // azul oscuro - día de semana
+  headerWE:   'FFF4CCCC',  // rosa - fin de semana
+  headerFer:  'FFFFD966',  // amarillo - feriado
+  headerTot:  'FFC6EFCE',  // verde - total
+  nameGreen:  'FF00B050',  // verde - nombre empleado
+  turnoDia:   'FFE8F0FE',  // azul muy claro - turno día
+  turnoWE:    'FFF4CCCC',  // rosa
+  baseDia:    'FFEBF3FB',  // azul claro
+  baseWE:     'FFF4CCCC',  // rosa
+  extra:      'FFFFF2CC',  // amarillo claro
+  extraWE:    'FFF4CCCC',  // rosa
+  totalDia:   'FFE2EFDA',  // verde claro
+  totalWE:    'FFF4CCCC',  // rosa
+  feriado:    'FFFFD966',  // amarillo
+  sinSalida:  'FFFFCCCC',  // rojo claro (sin salida)
+  blanco:     'FFFFFFFF',
+};
+
+// ============================================================
+// ESTADO
+// ============================================================
 let EMPLEADOS = EMPLEADOS_DEF.map(e => ({ ...e, excl: false }));
 let rawData = null;
 let quincena = 1;
 let mes, anio;
 let semanas = [];
 let tnPorSemana = {};
-let wbFinal = null;
-let filenameFinal = '';
+let lastBuffer = null;
+let lastFilename = '';
 
+// ============================================================
+// INIT
+// ============================================================
 const now = new Date();
 document.getElementById('selMes').value = now.getMonth() + 1;
 document.getElementById('inpAnio').value = now.getFullYear();
@@ -249,6 +268,9 @@ actualizarRango();
 document.getElementById('selMes').addEventListener('change', actualizarRango);
 document.getElementById('inpAnio').addEventListener('change', actualizarRango);
 
+// ============================================================
+// QUINCENA
+// ============================================================
 function selQuinc(q) {
   quincena = q;
   document.getElementById('q1btn').classList.toggle('sel', q === 1);
@@ -263,26 +285,30 @@ function actualizarRango() {
   const desde = quincena === 1 ? 1 : 16;
   const hasta = quincena === 1 ? 15 : ult;
   document.getElementById('rangoInfo').textContent =
-    `Período: ${desde} al ${hasta} de ${MESES_N[m]} ${y} (${hasta - desde + 1} días)`;
+    `Período: ${desde} al ${hasta} de ${MESES[m]} ${y}`;
 }
 
+// ============================================================
+// NAVEGACIÓN
+// ============================================================
 function goStep(n) {
   [1,2,3].forEach(i => {
     document.getElementById(`pg${i}`).classList.toggle('hidden', i !== n);
     const b = document.getElementById(`s${i}b`);
-    b.className = 'hdr-step' + (i === n ? ' active' : i < n ? ' done' : '');
+    b.className = 'hdr-step' + (i===n?' active':i<n?' done':'');
   });
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
 }
 
+// ============================================================
+// EMPLEADOS EDITOR
+// ============================================================
 function renderEmpEditor() {
   document.getElementById('empEditor').innerHTML = EMPLEADOS.map((e, i) => `
     <div class="emp-row">
       <div class="emp-leg">${e.id}</div>
       <input class="emp-name-inp" type="text" value="${e.nombre}" onchange="EMPLEADOS[${i}].nombre=this.value">
-      <button class="emp-excl-btn ${e.excl ? 'on' : ''}" onclick="toggleExcl(${i},this)">
-        ${e.excl ? '✕ Excluido' : 'Activo'}
-      </button>
+      <button class="emp-excl-btn ${e.excl?'on':''}" onclick="toggleExcl(${i},this)">${e.excl?'✕ Excluido':'Activo'}</button>
     </div>`).join('');
 }
 
@@ -292,28 +318,49 @@ function toggleExcl(i, btn) {
   btn.classList.toggle('on', EMPLEADOS[i].excl);
 }
 
+// ============================================================
+// CARGA DEL ARCHIVO
+// ============================================================
 const dropZone = document.getElementById('dropZone');
-const fi = document.getElementById('fi');
-fi.addEventListener('change', e => { if (e.target.files[0]) cargarArchivo(e.target.files[0]); });
+document.getElementById('fi').addEventListener('change', e => { if(e.target.files[0]) cargarArchivo(e.target.files[0]); });
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault(); dropZone.classList.remove('drag');
-  if (e.dataTransfer.files[0]) cargarArchivo(e.dataTransfer.files[0]);
+  if(e.dataTransfer.files[0]) cargarArchivo(e.dataTransfer.files[0]);
 });
 
 function cargarArchivo(file) {
   const reader = new FileReader();
   reader.onload = ev => {
     try {
-      const wb = XLSX.read(ev.target.result, { type: 'binary', cellDates: true, raw: false });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      rawData = XLSX.utils.sheet_to_json(ws, { raw: false, defval: '' });
+      const wb = XLSX.read(ev.target.result, { type:'binary', cellDates:true, raw:false });
+
+      // Buscar hoja "Reporte de Asistencia" (case-insensitive)
+      let sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('reporte') || n.toLowerCase().includes('asistencia'));
+      let sheetMsg = '';
+      if (sheetName) {
+        sheetMsg = `hoja "${sheetName}"`;
+      } else {
+        sheetName = wb.SheetNames[0];
+        sheetMsg = `primera hoja "${sheetName}" (no se encontró "Reporte de Asistencia")`;
+      }
+
+      const ws = wb.Sheets[sheetName];
+      rawData = XLSX.utils.sheet_to_json(ws, { raw:false, defval:'' });
+
+      if (!rawData || rawData.length === 0) {
+        setStatus('err', `❌ La hoja "${sheetName}" está vacía o no tiene datos.`);
+        return;
+      }
+
       detectarNuevos(rawData);
-      setStatus('ok', `✅ ${file.name} — ${rawData.length} registros cargados`);
+
+      const tipo = sheetName.toLowerCase().includes('reporte') ? 'ok' : 'warn';
+      setStatus(tipo, `✅ ${file.name} — ${rawData.length} registros en ${sheetMsg}`);
       dropZone.style.opacity = '.55';
       dropZone.style.pointerEvents = 'none';
-    } catch (err) {
+    } catch(err) {
       setStatus('err', `❌ Error al leer el archivo: ${err.message}`);
     }
   };
@@ -330,32 +377,33 @@ function setStatus(type, msg) {
 function detectarNuevos(data) {
   if (!data || !data.length) return;
   const keys = Object.keys(data[0]);
-  const idCol = keys.find(k => /enroll|userid|user.?id|id.?no|no\b|legajo/i.test(k)) || keys[0];
+  const idCol  = keys.find(k => /enroll|userid|user.?id|id.?no|no\b|legajo/i.test(k)) || keys[0];
   const nameCol = keys.find(k => /name|nombre/i.test(k));
   const conocidos = new Set(EMPLEADOS.map(e => e.id));
   const nuevos = new Set();
   data.forEach(row => {
-    const id = parseInt(String(row[idCol] || '').trim());
+    const id = parseInt(String(row[idCol]||'').trim());
     if (!id || isNaN(id) || EXCLUIDOS_FIJOS.has(id) || conocidos.has(id) || nuevos.has(id)) return;
     nuevos.add(id);
-    const nombre = nameCol ? String(row[nameCol] || '').trim() : `ID ${id}`;
-    EMPLEADOS.push({ id, nombre: nombre || `ID ${id}`, excl: true });
+    const nombre = nameCol ? String(row[nameCol]||'').trim() : `ID ${id}`;
+    EMPLEADOS.push({ id, nombre: nombre||`ID ${id}`, excl: true });
   });
   if (nuevos.size > 0) renderEmpEditor();
 }
 
-function getDiasDelMes(m, y) {
-  const n = new Date(y, m, 0).getDate();
-  return Array.from({ length: n }, (_, k) => {
-    const d = k + 1;
-    const dt = new Date(y, m - 1, d);
-    return { d, dateStr: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, dow: dt.getDay() };
-  });
-}
-
+// ============================================================
+// PASO 2 — SEMANAS
+// ============================================================
 function getDiasQ(m, y, q) {
-  const todos = getDiasDelMes(m, y);
-  return q === 1 ? todos.filter(d => d.d <= 15) : todos.filter(d => d.d > 15);
+  const n = new Date(y, m, 0).getDate();
+  const result = [];
+  const from = q === 1 ? 1 : 16;
+  const to   = q === 1 ? 15 : n;
+  for (let d = from; d <= to; d++) {
+    const dt = new Date(y, m-1, d);
+    result.push({ d, dateStr:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, dow:dt.getDay() });
+  }
+  return result;
 }
 
 function calcSemanas(dias) {
@@ -363,36 +411,33 @@ function calcSemanas(dias) {
   let cur = null;
   dias.forEach(dia => {
     const wd = dia.dow === 0 ? 7 : dia.dow;
-    if (wd === 1 || !cur) { if (cur) weeks.push(cur); cur = { dias: [] }; }
+    if (wd === 1 || !cur) { if(cur) weeks.push(cur); cur={dias:[]}; }
     cur.dias.push(dia);
   });
   if (cur && cur.dias.length) weeks.push(cur);
-  weeks.forEach((w, i) => { w.idx = i; });
+  weeks.forEach((w,i) => { w.idx=i; });
   return weeks;
 }
 
 function goStep2() {
   if (!rawData) { alert('⚠️ Primero cargá el archivo del reloj.'); return; }
-  mes = parseInt(document.getElementById('selMes').value);
+  mes  = parseInt(document.getElementById('selMes').value);
   anio = parseInt(document.getElementById('inpAnio').value);
   const diasQ = getDiasQ(mes, anio, quincena);
   semanas = calcSemanas(diasQ);
   tnPorSemana = {};
-
-  const label = `${quincena === 1 ? '1°' : '2°'} Quincena — ${MESES_N[mes]} ${anio}`;
-  document.getElementById('pgdLabel').textContent = label;
-
+  document.getElementById('pgdLabel').textContent =
+    `${quincena===1?'1°':'2°'} Quincena — ${MESES[mes]} ${anio}`;
   const activos = EMPLEADOS.filter(e => !e.excl);
   const container = document.getElementById('weeksContainer');
   container.innerHTML = '';
-
   semanas.forEach((sem, wi) => {
     tnPorSemana[wi] = new Set();
-    const f = sem.dias[0], l = sem.dias[sem.dias.length - 1];
+    const f = sem.dias[0], l = sem.dias[sem.dias.length-1];
     const div = document.createElement('div');
     div.className = 'week-block';
     div.innerHTML = `
-      <div class="week-title">Semana ${wi + 1} &nbsp;—&nbsp; días ${f.d} al ${l.d}</div>
+      <div class="week-title">Semana ${wi+1} &nbsp;—&nbsp; días ${f.d} al ${l.d}</div>
       <div class="chips">
         ${activos.map(e => `<div class="chip" data-wi="${wi}" data-id="${e.id}" onclick="toggleTN(${wi},${e.id},this)">${e.nombre}</div>`).join('')}
         <div class="chip chip-reset" onclick="resetSemana(${wi})">↺ Limpiar</div>
@@ -406,24 +451,26 @@ function toggleTN(wi, id, el) {
   const n = Number(id);
   tnPorSemana[wi].has(n) ? (tnPorSemana[wi].delete(n), el.classList.remove('on')) : (tnPorSemana[wi].add(n), el.classList.add('on'));
 }
-
 function resetSemana(wi) {
   tnPorSemana[wi].clear();
   document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c => c.classList.remove('on'));
 }
 
+// ============================================================
+// PARSEO DE REGISTROS DEL RELOJ
+// ============================================================
 function parsearRegistros() {
   if (!rawData || !rawData.length) return {};
   const keys = Object.keys(rawData[0]);
-  const idCol  = keys.find(k => /enroll|userid|user.?id|id.?no|no\b|legajo/i.test(k)) || keys[0];
-  const nameCol = keys.find(k => /name|nombre/i.test(k));
-  const dtCol  = keys.find(k => /datetime|fecha.*hora/i.test(k));
-  const dateCol = keys.find(k => /\bdate\b|\bfecha\b/i.test(k) && !/time/i.test(k));
-  const timeCol = keys.find(k => /\btime\b|\bhora\b/i.test(k) && !/date/i.test(k));
+  const idCol   = keys.find(k => /enroll|userid|user.?id|id.?no|^\s*no\s*$/i.test(k)) || keys[0];
+  const nameCol  = keys.find(k => /name|nombre/i.test(k));
+  const dtCol   = keys.find(k => /datetime|date.*time/i.test(k));
+  const dateCol  = keys.find(k => /\bdate\b|\bfecha\b/i.test(k) && !/time/i.test(k));
+  const timeCol  = keys.find(k => /\btime\b|\bhora\b/i.test(k) && !/date/i.test(k));
   const byEmp = {};
 
   rawData.forEach(row => {
-    const id = parseInt(String(row[idCol] || '').trim());
+    const id = parseInt(String(row[idCol]||'').trim());
     if (!id || isNaN(id) || EXCLUIDOS_FIJOS.has(id)) return;
     const ecfg = EMPLEADOS.find(e => e.id === id);
     if (!ecfg || ecfg.excl) return;
@@ -432,48 +479,50 @@ function parsearRegistros() {
     if (dtCol && row[dtCol]) dt = new Date(String(row[dtCol]).trim());
     else if (dateCol && row[dateCol]) {
       const ds = String(row[dateCol]).trim();
-      const ts = timeCol ? String(row[timeCol] || '00:00').trim() : '00:00';
+      const ts = timeCol ? String(row[timeCol]||'00:00').trim() : '00:00';
       dt = new Date(`${ds} ${ts}`);
     }
     if (!dt || isNaN(dt.getTime())) return;
 
     const dateKey = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-    const hora = dt.getHours() + dt.getMinutes() / 60;
-    if (!byEmp[id]) byEmp[id] = { id, nombre: ecfg.nombre, registros: [] };
+    const hora = dt.getHours() + dt.getMinutes()/60;
+
+    if (!byEmp[id]) byEmp[id] = { id, nombre: ecfg.nombre, registros:[] };
     byEmp[id].registros.push({ dateKey, hora, dt });
   });
 
+  // Armar turnos (con manejo de TN cruzando medianoche)
   Object.values(byEmp).forEach(emp => {
-    emp.registros.sort((a, b) => a.dt - b.dt);
+    emp.registros.sort((a,b) => a.dt-b.dt);
     emp.turnos = {};
     const regs = emp.registros;
     let i = 0;
     while (i < regs.length) {
       const r = regs[i];
-      const enMes = r.dt.getMonth() + 1 === mes && r.dt.getFullYear() === anio;
+      const enMes = r.dt.getMonth()+1 === mes && r.dt.getFullYear() === anio;
       if (!enMes) { i++; continue; }
       const wi = getWeekIdx(r.dateKey);
       const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(emp.id);
 
       if (esTN && r.hora >= 18) {
-        const next = regs[i + 1];
-        if (next && next.hora <= 12 && (next.dt - r.dt) < 14 * 3600000) {
-          emp.turnos[r.dateKey] = { entrada: r.hora, salida: next.hora + 24, esTN: true };
+        const next = regs[i+1];
+        if (next && next.hora <= 12 && (next.dt - r.dt) < 14*3600000) {
+          emp.turnos[r.dateKey] = { entrada:r.hora, salida:next.hora+24, esTN:true };
           i += 2;
         } else {
-          emp.turnos[r.dateKey] = { entrada: r.hora, salida: null, esTN: true };
+          emp.turnos[r.dateKey] = { entrada:r.hora, salida:null, esTN:true };
           i++;
         }
       } else if (esTN && r.hora <= 10) {
-        i++;
+        i++; // salida del turno noche anterior, ya contada
       } else {
         const entrada = r.hora;
-        const next = regs[i + 1];
+        const next = regs[i+1];
         let salida = null;
-        if (next && next.dateKey === r.dateKey && next.hora > entrada) { salida = next.hora; i += 2; }
-        else if (next && next.hora < entrada && (next.dt - r.dt) < 14 * 3600000) { salida = next.hora + 24; i += 2; }
+        if (next && next.dateKey === r.dateKey && next.hora > entrada) { salida=next.hora; i+=2; }
+        else if (next && next.hora < entrada && (next.dt-r.dt) < 14*3600000) { salida=next.hora+24; i+=2; }
         else { i++; }
-        if (!emp.turnos[r.dateKey]) emp.turnos[r.dateKey] = { entrada, salida, esTN: false };
+        if (!emp.turnos[r.dateKey]) emp.turnos[r.dateKey] = { entrada, salida, esTN:false };
       }
     }
   });
@@ -488,119 +537,252 @@ function getWeekIdx(dateStr) {
 }
 
 function fmtH(h) {
-  if (h === null || h === undefined) return '--:--';
-  const hh = Math.floor(h % 24), mm = Math.round((h % 1) * 60);
+  if (h===null||h===undefined) return '--:--';
+  const hh = Math.floor(h%24), mm = Math.round((h%1)*60);
   return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
 }
 
 function calcHoras(turno) {
-  if (!turno || turno.salida === null) return { base: 0, extra: 0, total: 0 };
+  if (!turno || turno.salida===null) return { base:0, extra:0, total:0 };
   const worked = Math.floor(turno.salida - turno.entrada);
-  if (worked <= 0 || worked > 20) return { base: 0, extra: 0, total: 0 };
+  if (worked<=0||worked>20) return { base:0, extra:0, total:0 };
   const base = turno.esTN ? 10 : 9;
-  const extra15 = Math.round(Math.max(0, worked - base) * 1.5 * 10) / 10;
-  return { base, extra: extra15, total: base + extra15, worked };
+  const extra15 = Math.round(Math.max(0, worked-base)*1.5*10)/10;
+  return { base, extra:extra15, total:base+extra15 };
 }
 
-function generarExcel() {
-  const empData = parsearRegistros();
-  const diasQ = getDiasQ(mes, anio, quincena);
-  const qLabel = quincena === 1 ? '1° Quincena' : '2° Quincena';
-  const titulo = `${MESES_N[mes]} ${anio} — ${qLabel}`;
+// ============================================================
+// GENERAR EXCEL CON FORMATO COMPLETO (ExcelJS)
+// ============================================================
+async function generarExcel() {
+  const btn = document.getElementById('btnGenerar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0"></div> Generando...';
 
-  const wb = XLSX.utils.book_new();
-  const aoa = buildAOA(empData, diasQ, titulo);
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{ wch: 28 }, ...diasQ.map(() => ({ wch: 10 })), { wch: 8 }];
-  XLSX.utils.book_append_sheet(wb, ws, qLabel);
+  try {
+    const empData = parsearRegistros();
+    const diasQ   = getDiasQ(mes, anio, quincena);
+    const qLabel  = quincena===1 ? '1° Quincena' : '2° Quincena';
+    const titulo  = `${MESES[mes]} ${anio} — ${qLabel}`;
 
-  filenameFinal = `Asistencia_${MESES_N[mes]}_${anio}_Q${quincena}.xlsx`;
-  wbFinal = wb;
-  document.getElementById('btnDL').onclick = () => XLSX.writeFile(wb, filenameFinal);
-  document.getElementById('excelInfo').textContent = `${titulo} — ${EMPLEADOS.filter(e => !e.excl).length} empleados`;
-  renderPreview(empData, diasQ);
-  XLSX.writeFile(wb, filenameFinal);
-  goStep(3);
-}
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Winflex';
+    wb.created = new Date();
+    const ws = wb.addWorksheet(qLabel);
 
-function buildAOA(empData, dias, titulo) {
-  const DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const rows = [
-    [titulo],
-    ['Empleado', ...dias.map(d => d.d), 'TOTAL'],
-    ['',         ...dias.map(d => DOW[d.dow]), ''],
-  ];
+    // --- Columnas ---
+    // Col 1 = A (spacer), Col 2 = B (labels), Col 3.. = días, últimacol = TOT
+    const totColIdx = 2 + diasQ.length + 1; // índice basado en 1
+    ws.getColumn(1).width = 2;
+    ws.getColumn(2).width = 22;
+    for (let i = 0; i < diasQ.length; i++) ws.getColumn(3+i).width = 7;
+    ws.getColumn(totColIdx).width = 8;
 
-  EMPLEADOS.filter(e => !e.excl).forEach(ecfg => {
-    const emp = empData[ecfg.id];
-    const rNom = [ecfg.nombre], rTur = ['Turno'], rHor = ['Horario'];
-    const rBase = ['Hs. Base'], rExt = ['Hs. Extra x1.5'], rTot = ['TOTAL'];
-    let totBase = 0, totExt = 0, totTot = 0;
+    // Helper fill sólido
+    const sf = hex => ({ type:'pattern', pattern:'solid', fgColor:{ argb: hex } });
+    const baseFont = { name:'Calibri', size:10 };
+    const boldFont = { name:'Calibri', size:10, bold:true };
+    const cen = { horizontal:'center', vertical:'middle' };
+    const cenWrap = { horizontal:'center', vertical:'middle', wrapText:false };
 
-    dias.forEach(dia => {
-      const wi = getWeekIdx(dia.dateStr);
-      const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(ecfg.id);
-      const turno = emp ? (emp.turnos[dia.dateStr] || null) : null;
-      const feriado = FERIADOS.has(dia.dateStr);
-      const weekend = dia.dow === 0 || dia.dow === 6;
-      rTur.push(esTN ? 'TN' : 'TM');
+    // --- Fila 1: Números de día ---
+    const r1 = ws.getRow(1);
+    r1.height = 18;
+    diasQ.forEach((dia, i) => {
+      const col = 3+i;
+      const isWE = dia.dow===0||dia.dow===6;
+      const isFer = FERIADOS.has(dia.dateStr);
+      const clr = isFer ? CLR.headerFer : isWE ? CLR.headerWE : CLR.headerDia;
+      const txtClr = (isFer||isWE) ? 'FF000000' : 'FFFFFFFF';
+      const c = ws.getCell(1, col);
+      c.value = dia.d;
+      c.fill = sf(clr); c.font = {...boldFont, color:{argb:txtClr}};
+      c.alignment = cen;
+    });
+    const cTot1 = ws.getCell(1, totColIdx);
+    cTot1.value='TOT'; cTot1.fill=sf(CLR.headerTot); cTot1.font=boldFont; cTot1.alignment=cen;
 
-      if (feriado && !turno) {
-        rHor.push('Feriado'); rBase.push(8); rExt.push(0); rTot.push(8);
-        totBase += 8; totTot += 8;
-      } else if ((weekend || feriado) && turno && turno.salida !== null) {
-        const worked = Math.floor(turno.salida - turno.entrada);
-        const hs = Math.max(0, worked) * 2;
-        rHor.push(`${fmtH(turno.entrada)}-${fmtH(turno.salida % 24)}`);
-        rBase.push(0); rExt.push(0); rTot.push(hs); totTot += hs;
-      } else if (turno && turno.salida !== null) {
-        const h = calcHoras({ ...turno, esTN });
-        rHor.push(`${fmtH(turno.entrada)}-${fmtH(turno.salida % 24)}`);
-        rBase.push(h.base); rExt.push(h.extra); rTot.push(h.total);
-        totBase += h.base; totExt += h.extra; totTot += h.total;
-      } else if (turno) {
-        rHor.push(`${fmtH(turno.entrada)} s/s`); rBase.push(0); rExt.push(0); rTot.push(0);
-      } else {
-        rHor.push(''); rBase.push(''); rExt.push(''); rTot.push('');
-      }
+    // --- Fila 2: Nombres de día ---
+    const r2 = ws.getRow(2);
+    r2.height = 16;
+    diasQ.forEach((dia, i) => {
+      const col = 3+i;
+      const isWE = dia.dow===0||dia.dow===6;
+      const isFer = FERIADOS.has(dia.dateStr);
+      const clr = isFer ? CLR.headerFer : isWE ? CLR.headerWE : CLR.headerDia;
+      const txtClr = (isFer||isWE) ? 'FF000000' : 'FFFFFFFF';
+      const c = ws.getCell(2, col);
+      c.value = DOW_NOM[dia.dow];
+      c.fill = sf(clr); c.font = {...boldFont, color:{argb:txtClr}};
+      c.alignment = cen;
+    });
+    const cTot2 = ws.getCell(2, totColIdx);
+    cTot2.value='hs'; cTot2.fill=sf(CLR.headerTot); cTot2.font=boldFont; cTot2.alignment=cen;
+
+    // --- Bloques de empleados ---
+    let curRow = 3;
+    const activos = EMPLEADOS.filter(e => !e.excl);
+
+    activos.forEach(ecfg => {
+      const emp = empData[ecfg.id];
+      const rN = curRow;     // Nombre
+      const rT = curRow+1;   // Turno
+      const rH = curRow+2;   // Horario
+      const rB = curRow+3;   // Horas base
+      const rE = curRow+4;   // Horas extra
+      const rX = curRow+5;   // Horas totales
+
+      // --- Fila Nombre (merge B:TOT) ---
+      ws.getRow(rN).height = 18;
+      const cName = ws.getCell(rN, 2);
+      cName.value = ecfg.nombre.toUpperCase();
+      cName.fill = sf(CLR.nameGreen);
+      cName.font = {...boldFont, color:{argb:'FFFFFFFF'}};
+      cName.alignment = { horizontal:'center', vertical:'middle' };
+      ws.mergeCells(rN, 2, rN, totColIdx);
+
+      // --- Etiquetas fila B ---
+      const setLabel = (row, txt, fillHex, bold=false) => {
+        const c = ws.getCell(row, 2);
+        c.value = txt;
+        if (fillHex) c.fill = sf(fillHex);
+        c.font = bold ? boldFont : baseFont;
+        c.alignment = { vertical:'middle' };
+      };
+      setLabel(rT, 'Turno',             CLR.turnoDia);
+      setLabel(rH, 'Entrada / Salida',  null);
+      setLabel(rB, 'Horas base (9h)',   CLR.baseDia);
+      setLabel(rE, 'Horas extra (x1.5)',CLR.extra);
+      setLabel(rX, 'Horas totales',     CLR.totalDia, true);
+
+      // --- Columna TOT (sólo extra) pre-declarada ---
+      let sumExtra = 0;
+
+      // --- Días ---
+      diasQ.forEach((dia, i) => {
+        const col = 3+i;
+        const isWE = dia.dow===0||dia.dow===6;
+        const isFer = FERIADOS.has(dia.dateStr);
+        const wi = getWeekIdx(dia.dateStr);
+        const esTN = wi>=0 && tnPorSemana[wi] && tnPorSemana[wi].has(ecfg.id);
+        const turno = emp ? (emp.turnos[dia.dateStr]||null) : null;
+
+        const dayFill    = isFer ? CLR.feriado : isWE ? CLR.turnoWE  : CLR.turnoDia;
+        const baseFill   = isFer ? CLR.feriado : isWE ? CLR.baseWE   : CLR.baseDia;
+        const extraFill  = isFer ? CLR.feriado : isWE ? CLR.extraWE  : CLR.extra;
+        const totalFill  = isFer ? CLR.feriado : isWE ? CLR.totalWE  : CLR.totalDia;
+
+        // TURNO
+        const cTur = ws.getCell(rT, col);
+        cTur.value = esTN ? 'TN' : 'TM';
+        cTur.fill = sf(dayFill); cTur.font = baseFont; cTur.alignment = cen;
+
+        // HORARIO
+        const cHor = ws.getCell(rH, col);
+        cHor.alignment = cenWrap; cHor.font = baseFont;
+        if (isFer && !turno) {
+          cHor.value = 'F'; cHor.fill = sf(CLR.feriado); cHor.alignment = cen;
+        } else if (isWE && !turno) {
+          cHor.fill = sf(CLR.turnoWE);
+        } else if (turno && turno.salida!==null) {
+          cHor.value = fmtH(turno.entrada)+fmtH(turno.salida%24);
+          cHor.fill = sf(CLR.blanco);
+        } else if (turno) {
+          cHor.value = fmtH(turno.entrada);
+          cHor.fill = sf(CLR.sinSalida); cHor.font = {...baseFont, bold:true};
+        } else {
+          cHor.fill = isWE ? sf(CLR.turnoWE) : sf(CLR.blanco);
+        }
+
+        // CALCULAR HORAS
+        let baseVal='', extVal='', totVal='';
+        if (isFer && !turno) {
+          baseVal=8; extVal='-'; totVal=8;
+        } else if ((isWE||isFer) && turno && turno.salida!==null) {
+          const worked = Math.floor(turno.salida-turno.entrada);
+          baseVal='-'; extVal='-'; totVal=Math.max(0,worked)*2;
+        } else if (turno && turno.salida!==null) {
+          const h = calcHoras({...turno, esTN});
+          baseVal=h.base; extVal=h.extra||'-'; totVal=h.total;
+          sumExtra += h.extra;
+        } else {
+          baseVal=''; extVal=''; totVal='';
+        }
+
+        // BASE
+        const cB = ws.getCell(rB, col);
+        cB.value=baseVal; cB.fill=sf(baseFill); cB.font=baseFont; cB.alignment=cen;
+
+        // EXTRA
+        const cE = ws.getCell(rE, col);
+        cE.value=extVal; cE.fill=sf(extraFill); cE.font=baseFont; cE.alignment=cen;
+
+        // TOTAL
+        const cX = ws.getCell(rX, col);
+        cX.value=totVal; cX.fill=sf(totalFill); cX.font=boldFont; cX.alignment=cen;
+      });
+
+      // TOT extra
+      const cTotE = ws.getCell(rE, totColIdx);
+      cTotE.value = Math.round(sumExtra*10)/10 || '-';
+      cTotE.fill = sf(CLR.headerTot); cTotE.font = boldFont; cTotE.alignment = cen;
+
+      curRow += 7; // 6 filas + 1 vacía
     });
 
-    rNom.push(...Array(dias.length).fill(''));
-    rBase.push(totBase);
-    rExt.push(Math.round(totExt * 10) / 10);
-    rTot.push(Math.round(totTot * 10) / 10);
-    rows.push(rNom, rTur, rHor, rBase, rExt, rTot, []);
-  });
-  return rows;
+    // --- Descargar ---
+    const buffer = await wb.xlsx.writeBuffer();
+    lastBuffer = buffer;
+    lastFilename = `Asistencia_${MESES[mes]}_${anio}_Q${quincena}.xlsx`;
+
+    descargar(buffer, lastFilename);
+    document.getElementById('btnDL').onclick = () => descargar(lastBuffer, lastFilename);
+    document.getElementById('excelInfo').textContent = `${titulo} — ${activos.length} empleados`;
+    renderPreview(empData, diasQ);
+    goStep(3);
+
+  } catch(err) {
+    alert('Error generando Excel: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Generar Excel';
+  }
 }
 
+function descargar(buffer, filename) {
+  const blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+// ============================================================
+// PREVIEW WEB
+// ============================================================
 function renderPreview(empData, dias) {
-  const activos = EMPLEADOS.filter(e => !e.excl);
+  const activos = EMPLEADOS.filter(e=>!e.excl);
   let html = `<table><thead><tr>
     <th>Empleado</th><th>Leg.</th>
     <th class="num">Días</th><th class="num">Hs. Base</th>
     <th class="num">Hs. Extra</th><th class="num">Total Hs.</th><th>Turno</th>
   </tr></thead><tbody>`;
-  let totalG = 0;
-
+  let totalG=0;
   activos.forEach(ecfg => {
     const emp = empData[ecfg.id];
-    let diasT = 0, hsBase = 0, hsExt = 0, hsTot = 0, tieneTN = false;
+    let diasT=0, hsBase=0, hsExt=0, hsTot=0, tieneTN=false;
     dias.forEach(dia => {
-      const wi = getWeekIdx(dia.dateStr);
-      const esTN = wi >= 0 && tnPorSemana[wi] && tnPorSemana[wi].has(ecfg.id);
-      if (esTN) tieneTN = true;
-      if (!emp) { if (FERIADOS.has(dia.dateStr)) { hsTot += 8; hsBase += 8; } return; }
-      const turno = emp.turnos[dia.dateStr];
-      if (FERIADOS.has(dia.dateStr) && !turno) { hsTot += 8; hsBase += 8; return; }
-      if (turno && turno.salida !== null) {
-        diasT++;
-        const h = calcHoras({ ...turno, esTN });
-        hsBase += h.base; hsExt += h.extra; hsTot += h.total;
-      }
+      const wi=getWeekIdx(dia.dateStr);
+      const esTN=wi>=0&&tnPorSemana[wi]&&tnPorSemana[wi].has(ecfg.id);
+      if(esTN) tieneTN=true;
+      if(FERIADOS.has(dia.dateStr) && !(emp&&emp.turnos[dia.dateStr])) { hsTot+=8; hsBase+=8; return; }
+      if(!emp) return;
+      const t=emp.turnos[dia.dateStr];
+      if(t&&t.salida!==null){ diasT++; const h=calcHoras({...t,esTN}); hsBase+=h.base; hsExt+=h.extra; hsTot+=h.total; }
     });
-    totalG += hsTot;
-    html += `<tr>
+    totalG+=hsTot;
+    html+=`<tr>
       <td class="fw7">${ecfg.nombre}</td>
       <td style="color:var(--text-muted);font-size:12px">${ecfg.id}</td>
       <td class="num">${diasT}</td>
@@ -610,12 +792,11 @@ function renderPreview(empData, dias) {
       <td><span class="badge ${tieneTN?'badge-tn':'badge-tm'}">${tieneTN?'TN':'TM'}</span></td>
     </tr>`;
   });
-
-  html += `</tbody><tfoot><tr>
+  html+=`</tbody><tfoot><tr>
     <td colspan="5">TOTAL PLANTEL</td>
     <td class="num">${Math.round(totalG*10)/10}</td><td></td>
   </tr></tfoot></table>`;
-  document.getElementById('previewTbl').innerHTML = html;
+  document.getElementById('previewTbl').innerHTML=html;
 }
 </script>
 </body>
