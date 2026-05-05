@@ -394,10 +394,9 @@ function calcH(entry,exit,grantsNoct){
   if(e===null||s0===null)return{b:0,noct:0,x:0,tot:0};
   let s=s0;if(s<=e)s+=24;
   const w=Math.floor(s-e);
-  const b=9;
-  const noct=grantsNoct?1:0;
-  const ef=b+noct;
-  const x=Math.round(Math.max(0,w-ef)*1.5*10)/10;
+  const b=Math.min(9,w);                              // si trabajó <9h, base = lo trabajado
+  const noct=(grantsNoct&&w>=1)?1:0;                  // +1h noct sólo si trabajó algo
+  const x=Math.round(Math.max(0,w-9)*1.5*10)/10;      // extras siempre a partir de 9h
   return{b,noct,x,tot:b+noct+x};
 }
 // Fin de semana / feriado trabajado: total = horas × 2 (sin noct)
@@ -490,7 +489,7 @@ function buildStylesXML(){
 
 function escXML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function colLetter(n){let s='';while(n>0){const r=(n-1)%26;s=String.fromCharCode(65+r)+s;n=Math.floor((n-1)/26);}return s;}
-function cv(v,s){return{v,s};}
+function cv(v,s,f){return f?{v,s,f}:{v,s};}
 
 function buildSheetXML(rows,colWidths,merges){
   const colsXML=colWidths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('');
@@ -501,7 +500,11 @@ function buildSheetXML(rows,colWidths,merges){
     row.forEach((cell,ci)=>{
       if(cell===null||cell===undefined||cell==='')return;
       const addr=colLetter(ci+1)+(ri+1);const s=cell.s||0;
-      if(typeof cell.v==='number')cells+=`<c r="${addr}" s="${s}"><v>${cell.v}</v></c>`;
+      if(cell.f){
+        const fv=typeof cell.v==='number'?cell.v:0;
+        cells+=`<c r="${addr}" s="${s}"><f>${escXML(cell.f)}</f><v>${fv}</v></c>`;
+      }
+      else if(typeof cell.v==='number')cells+=`<c r="${addr}" s="${s}"><v>${cell.v}</v></c>`;
       else cells+=`<c r="${addr}" t="inlineStr" s="${s}"><is><t>${escXML(cell.v)}</t></is></c>`;
     });
     rowsXML+=`<row r="${ri+1}">${cells}</row>`;
@@ -551,61 +554,61 @@ async function generarYDescargar(){
       const rNo=[null,cv('Horas nocturnas (TN +1h)',XF.LBL_NOCT)];
       const rX=[null,cv('Horas extra (x1.5)',XF.LBL_EXT)];
       const rTo=[null,cv('Horas totales',XF.LBL_TOT)];
-      let sumB=0,sumN=0,sumX=0;
+      let sumB=0,sumN=0,sumX=0,sumTo=0;
 
       const empShifts=SHIFTS[ecfg.leg]||{};
-      dias.forEach(dia=>{
+      // Filas en el sheet (1-based) — startRow es donde se pushed rN antes de este bloque
+      const rTRow=startRow+1, rHRow=startRow+2, rBRow=startRow+3, rNoRow=startRow+4, rXRow=startRow+5, rToRow=startRow+6;
+      const firstDayCol=colLetter(3), lastDayCol=colLetter(2+nDias);
+      dias.forEach((dia,i)=>{
+        const dayCol=colLetter(3+i);
+        const sumF=`SUM(${dayCol}${rBRow}:${dayCol}${rXRow})`;  // fórmula total por día (base+noct+extra)
         const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
         const ve=getDayVE(ecfg.leg,dia.d);
         const sh=ve?null:empShifts[dia.d];
         const isTN=sh&&sh.type==='TN';
-        // Aplicar tolerancia ±20 min al snap horario
         const entry=sh?applyTol(sh.entry):null;
         const exit=sh?applyTol(sh.exit):null;
         const disp=entry?(entry+(exit||'')):'';
-        const grantsNoct=isTN&&!we&&!fer;  // +1 noct solo en hábiles
+        const grantsNoct=isTN&&!we&&!fer;
 
         rT.push(cv(isTN?'TN':'TM',fer?XF.TUR_FER:we?XF.TUR_WE:XF.TUR_DIA));
 
         if(ve){
-          // Vacaciones o Enfermedad — 8 hs
           const xfH=ve==='V'?XF.HOR_VAC:XF.HOR_ENF;
           rH.push(cv(ve,xfH));
           rB.push(cv(8,XF.BAS_VE));
           rNo.push(cv('-',XF.NOCT_BLANK));
           rX.push(cv('-',XF.EXT_VE));
-          rTo.push(cv(8,XF.TOT_VE));
-          sumB+=8;
+          rTo.push(cv(8,XF.TOT_VE,sumF));
+          sumB+=8;sumTo+=8;
         }else if(fer&&!exit){
-          // Feriado sin fichaje completo: 8 hs
           rH.push(cv('F',XF.HOR_FER));rB.push(cv(8,XF.BAS_FER));
           rNo.push(cv('-',XF.NOCT_BLANK));
-          rX.push(cv('-',XF.EXT_FER));rTo.push(cv(8,XF.TOT_FER));
-          sumB+=8;
+          rX.push(cv('-',XF.EXT_FER));rTo.push(cv(8,XF.TOT_FER,sumF));
+          sumB+=8;sumTo+=8;
         }else if((we||fer)&&entry&&exit){
-          // Fin de semana / feriado trabajado: × 2, sin noct
+          // Weekend / feriado trabajado: total estático = horas × 2 (sin noct, no usa SUM)
           const hsTot=calcHWE(entry,exit);
           rH.push(cv(disp,fer?XF.HOR_FER:XF.HOR_WE));
           rB.push(cv('-',fer?XF.BAS_FER:XF.BAS_WE));
           rNo.push(cv('-',XF.NOCT_BLANK));
           rX.push(cv('-',fer?XF.EXT_FER:XF.EXT_WE));
           rTo.push(cv(hsTot,fer?XF.TOT_FER:XF.TOT_WE));
-          sumB+=hsTot;
+          sumTo+=hsTot;  // NO sumamos a sumB; va al total fila por la fórmula =SUM(rTo)
         }else if(we&&!exit){
           rH.push(cv(entry||'',XF.HOR_WE));rB.push(cv('',XF.BAS_WE));
           rNo.push(cv('',XF.NOCT_BLANK));
           rX.push(cv('',XF.EXT_WE));rTo.push(cv('',XF.TOT_WE));
         }else if(entry&&exit){
-          // Día hábil con fichaje completo
           const h=calcH(entry,exit,grantsNoct);
           rH.push(cv(disp,XF.HOR));
           rB.push(cv(h.b,XF.BAS_DIA));
           rNo.push(cv(h.noct||'-',h.noct?XF.NOCT_DIA:XF.NOCT_BLANK));
           rX.push(cv(h.x||'-',XF.EXT_DIA));
-          rTo.push(cv(h.tot,XF.TOT_DIA));
-          sumB+=h.b;sumN+=h.noct;sumX+=h.x;
+          rTo.push(cv(h.tot,XF.TOT_DIA,sumF));
+          sumB+=h.b;sumN+=h.noct;sumX+=h.x;sumTo+=h.tot;
         }else if(entry&&!exit){
-          // Fichaje incompleto (sólo entrada)
           rH.push(cv(entry,XF.HOR_SINSAL));rB.push(cv('',XF.BAS_DIA));
           rNo.push(cv('',XF.NOCT_BLANK));
           rX.push(cv('',XF.EXT_DIA));rTo.push(cv('',XF.TOT_DIA));
@@ -616,12 +619,12 @@ async function generarYDescargar(){
         }
       });
 
-      const sumTot=Math.round((sumB+sumN+sumX)*10)/10;
       rT.push(null);rH.push(null);
-      rB.push(cv(sumB,XF.COL_TOT));
-      rNo.push(cv(sumN||'-',XF.COL_TOT));
-      rX.push(cv(Math.round(sumX*10)/10||'-',XF.COL_TOT));
-      rTo.push(cv(sumTot,XF.COL_TOT));
+      rB.push(cv(sumB,XF.COL_TOT,`SUM(${firstDayCol}${rBRow}:${lastDayCol}${rBRow})`));
+      rNo.push(sumN>0?cv(sumN,XF.COL_TOT,`SUM(${firstDayCol}${rNoRow}:${lastDayCol}${rNoRow})`):cv('-',XF.COL_TOT));
+      const sxR=Math.round(sumX*10)/10;
+      rX.push(sumX>0?cv(sxR,XF.COL_TOT,`SUM(${firstDayCol}${rXRow}:${lastDayCol}${rXRow})`):cv('-',XF.COL_TOT));
+      rTo.push(cv(Math.round(sumTo*10)/10,XF.COL_TOT,`SUM(${firstDayCol}${rToRow}:${lastDayCol}${rToRow})`));
       sheetRows.push(rT,rH,rB,rNo,rX,rTo,[null]);
     });
 
@@ -663,8 +666,12 @@ function renderPrev(dias){
       if(!sh||!sh.exit)return;
       const entry=applyTol(sh.entry),exit=applyTol(sh.exit);
       d++;
-      if(we||fer){const hs=calcHWE(entry,exit);t+=hs;b+=hs;}
-      else{const hh=calcH(entry,exit,isTN);b+=hh.b;nh+=hh.noct;x+=hh.x;t+=hh.tot;}
+      if(we||fer){const hs=calcHWE(entry,exit);t+=hs;}  // weekend/feriado: solo a Total
+      else{
+        const grantsNoct=isTN;  // ya garantizado !we && !fer en este branch
+        const hh=calcH(entry,exit,grantsNoct);
+        b+=hh.b;nh+=hh.noct;x+=hh.x;t+=hh.tot;
+      }
     });
     totG+=t;
     h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr" style="color:#c4620a">${nTN||'-'}</td><td class="nr" style="color:#1b6b2a">${nV||'-'}</td><td class="nr" style="color:#7a5200">${nE||'-'}</td><td class="nr">${b}</td><td class="nr" style="color:#5b3a8a">${nh||'-'}</td><td class="nr">${Math.round(x*10)/10||'-'}</td><td class="nr fw">${Math.round(t*10)/10}</td></tr>`;
