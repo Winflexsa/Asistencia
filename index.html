@@ -94,7 +94,7 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
   <div class="steps">
     <div class="step on" id="s1"><div class="dot">1</div> Cargar</div>
     <div class="sep"></div>
-    <div class="step" id="s2"><div class="dot">2</div> TN + V + E</div>
+    <div class="step" id="s2"><div class="dot">2</div> Revisión + V + E</div>
     <div class="sep"></div>
     <div class="step" id="s3"><div class="dot">3</div> Descargar</div>
   </div>
@@ -145,8 +145,8 @@ tfoot td{background:var(--c2);font-weight:700;border-top:2px solid var(--brd)}
 <!-- PASO 2 -->
 <div id="p2" class="hid">
   <div class="card">
-    <div class="hd">🌙 Turno Noche — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
-    <p class="sm" style="margin-bottom:14px">Hacé clic en cada empleado que estuvo de noche esa semana.</p>
+    <div class="hd">🌙 Turnos Noche detectados — <span id="p2lbl" style="color:var(--dim);font-weight:400;font-size:13px"></span></div>
+    <p class="sm" style="margin-bottom:14px">Detección automática por día según horario de entrada (≥16:00). El +1h nocturna se aplica solo en días hábiles.</p>
     <div class="wl" id="semCont"></div>
   </div>
   <div class="card">
@@ -197,7 +197,7 @@ const MN=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','
 const DN=['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
 
 let EMPS=CFG.map(e=>({...e,excl:false}));
-let fileEmps={},Q=1,MES,ANIO,SEMS=[],TN={};
+let fileEmps={},Q=1,MES,ANIO,SHIFTS={};
 // DIAS_VE[leg][day] = 'V' | 'E' | null
 let DIAS_VE={};
 
@@ -273,8 +273,6 @@ function loadFile(file){
 function setSt(t,m){const el=document.getElementById('fst');el.className='st '+t;el.textContent=m;el.classList.remove('hid');}
 
 function getDias(m,y,q){const tot=new Date(y,m,0).getDate(),f=q===1?1:16,t=q===1?15:tot,dias=[];for(let d=f;d<=t;d++){const dt=new Date(y,m-1,d);dias.push({d,ds:`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,dow:dt.getDay()});}return dias;}
-function calcSems(dias){const ws=[];let cur=null;dias.forEach(d=>{const wd=d.dow===0?7:d.dow;if(wd===1||!cur){if(cur)ws.push(cur);cur={dias:[]};}cur.dias.push(d);});if(cur&&cur.dias.length)ws.push(cur);return ws;}
-function getWidx(ds){for(let i=0;i<SEMS.length;i++)if(SEMS[i].dias.some(d=>d.ds===ds))return i;return -1;}
 function getDayVE(leg,day){return(DIAS_VE[leg]||{})[day]||null;}
 
 // Ciclo: null → 'V' → 'E' → null
@@ -292,18 +290,40 @@ function irP2(){
   if(!Object.keys(fileEmps).length){alert('Primero cargá el archivo del reloj.');return;}
   MES=+document.getElementById('sm2').value;ANIO=+document.getElementById('sa').value;
   const dias=getDias(MES,ANIO,Q);
-  SEMS=calcSems(dias);TN={};DIAS_VE={};
+  SHIFTS={};DIAS_VE={};
   document.getElementById('p2lbl').textContent=`${Q===1?'1°':'2°'} Quincena — ${MN[MES]} ${ANIO}`;
   const act=EMPS.filter(e=>!e.excl);
 
-  // Semanas TN
-  const semC=document.getElementById('semCont');semC.innerHTML='';
-  SEMS.forEach((s,wi)=>{
-    TN[wi]=new Set();const f=s.dias[0],l=s.dias[s.dias.length-1];
-    const d=document.createElement('div');d.className='wb';
-    d.innerHTML=`<div class="wt">Semana ${wi+1} — días ${f.d} al ${l.d}</div><div class="chips">${act.map(e=>`<div class="chip" data-wi="${wi}" data-leg="${e.leg}" onclick="togTN(${wi},${e.leg},this)">${e.n}</div>`).join('')}<div class="chip cr" onclick="clrS(${wi})">↺ Limpiar</div></div>`;
-    semC.appendChild(d);
+  // Auto-detectar turnos por día para cada empleado
+  act.forEach(e=>{
+    const fe=fileEmps[e.leg];
+    SHIFTS[e.leg]=fe?detectShifts(fe.att):{};
   });
+
+  // Resumen de TN auto-detectados
+  const semC=document.getElementById('semCont');semC.innerHTML='';
+  const dSet=new Set(dias.map(d=>d.d));
+  act.forEach(e=>{
+    const sh=SHIFTS[e.leg]||{};
+    const tnDays=[],tnWeDays=[];
+    dias.forEach(d=>{
+      const s=sh[d.d];if(!s||s.type!=='TN')return;
+      const we=d.dow===0||d.dow===6,fer=FERIAS.has(d.ds);
+      if(we||fer)tnWeDays.push(d.d);else tnDays.push(d.d);
+    });
+    const tot=tnDays.length+tnWeDays.length;
+    if(tot===0)return;
+    const div=document.createElement('div');div.className='wb';
+    let html=`<div class="wt">${e.n} — ${tot} día${tot>1?'s':''} TN detectado${tot>1?'s':''}</div><div class="sm" style="line-height:1.6">`;
+    if(tnDays.length)html+=`<span style="color:#5b3a8a"><b>Hábil (con +1h noct):</b> ${tnDays.join(', ')}</span><br>`;
+    if(tnWeDays.length)html+=`<span style="color:#c4620a"><b>Fin de sem./feriado (sin +1h):</b> ${tnWeDays.join(', ')}</span>`;
+    html+='</div>';
+    div.innerHTML=html;
+    semC.appendChild(div);
+  });
+  if(!semC.children.length){
+    semC.innerHTML='<div class="sm" style="padding:10px">No se detectaron turnos noche en esta quincena.</div>';
+  }
 
   // V/E por día
   const vacC=document.getElementById('vacTable');vacC.innerHTML='';
@@ -321,36 +341,70 @@ function irP2(){
 
   ir(2);
 }
-function togTN(wi,leg,el){const n=+leg;TN[wi].has(n)?(TN[wi].delete(n),el.classList.remove('on')):(TN[wi].add(n),el.classList.add('on'));}
-function clrS(wi){TN[wi].clear();document.querySelectorAll(`.chip[data-wi="${wi}"]`).forEach(c=>c.classList.remove('on'));}
-
 function parseH(s){if(!s||s.length<5)return null;const hh=parseInt(s.substring(0,2)),mm=parseInt(s.substring(3,5));if(isNaN(hh)||isNaN(mm))return null;return hh+mm/60;}
-function getTurno(att,day,isTN){
-  const val=(att[day]||'').trim();if(!val)return null;
-  const h0=parseH(val.substring(0,5));if(h0===null)return null;
-  if(isTN){
-    if(h0>=18){const e=val.substring(0,5);const nv=(att[day+1]||'').trim();const hn=nv?parseH(nv.substring(0,5)):null;const s=(hn!==null&&hn>=5&&hn<=12)?nv.substring(0,5):null;return{e,s,disp:e+(s||'')};}
-    if(h0>=5&&h0<=13&&val.length>=10){const h1=parseH(val.substring(5,10));if(h1!==null&&h1>=18){const e=val.substring(5,10);const nv=(att[day+1]||'').trim();const hn=nv?parseH(nv.substring(0,5)):null;const s=(hn!==null&&hn>=5&&hn<=12)?nv.substring(0,5):null;return{e,s,disp:e+(s||'')};}}
-    if(h0>=5&&h0<=13&&val.length===5)return null;
-  }
-  const e=val.substring(0,5);const s=val.length>=10?val.substring(val.length-5):null;return{e,s,disp:e+(s||'')};
+
+// Tolerancia ±20 min: si la ficha está cerca de una hora redonda, snap a esa hora
+function applyTol(t){
+  if(!t)return t;
+  const h=parseH(t);if(h===null)return t;
+  const fl=Math.floor(h);
+  const past=Math.round((h-fl)*60);
+  if(past<=20)return String(fl%24).padStart(2,'0')+':00';
+  if(past>=40)return String((fl+1)%24).padStart(2,'0')+':00';
+  return t;
 }
-function calcH(t,isTN){
-  if(!t||!t.s)return{b:0,noct:0,x:0,tot:0};
-  let e=parseH(t.e),s=parseH(t.s);if(e===null||s===null)return{b:0,noct:0,x:0,tot:0};
-  if(s<=e)s+=24;
+// Parsea tokens hh:mm desde una cadena concatenada del reloj (ej "07:0019:01" → [{t:"07:00",h:7},{t:"19:01",h:19.02}])
+function parseTokens(val){
+  const v=(val||'').trim();const r=[];
+  for(let i=0;i+5<=v.length;i+=5){
+    const t=v.substring(i,i+5);const h=parseH(t);
+    if(h!==null)r.push({t,h});
+  }
+  return r;
+}
+// Auto-detecta TM/TN por día. Devuelve {dayN: {type, entry, exit}|null}.
+// Regla: si la primera ficha "propia" del día es ≥16:00 → TN (exit en mañana del día siguiente).
+// Si el día anterior fue TN, su salida consume la primera ficha matinal (<14:00) de hoy.
+function detectShifts(att){
+  const tokens={};
+  for(let d=1;d<=31;d++)tokens[d]=parseTokens(att[d]);
+  const shifts={};let prevTNExit=false;
+  for(let d=1;d<=31;d++){
+    const ts=tokens[d];let consumed=0;
+    if(prevTNExit&&ts[0]&&ts[0].h<14)consumed=1;
+    prevTNExit=false;
+    const rem=ts.slice(consumed);
+    if(!rem.length){shifts[d]=null;continue;}
+    const first=rem[0];
+    if(first.h>=16){
+      const next=tokens[d+1]||[];
+      const exit=(next[0]&&next[0].h<14)?next[0].t:null;
+      shifts[d]={type:'TN',entry:first.t,exit};
+      if(exit)prevTNExit=true;
+    }else{
+      const last=rem.length>=2?rem[rem.length-1]:null;
+      shifts[d]={type:'TM',entry:first.t,exit:last?last.t:null};
+    }
+  }
+  return shifts;
+}
+
+function calcH(entry,exit,grantsNoct){
+  const e=parseH(entry),s0=parseH(exit);
+  if(e===null||s0===null)return{b:0,noct:0,x:0,tot:0};
+  let s=s0;if(s<=e)s+=24;
   const w=Math.floor(s-e);
-  const b=9;                 // base siempre 9
-  const noct=isTN?1:0;       // +1 por turno noche, fila aparte
-  const ef=b+noct;           // umbral para extras
+  const b=9;
+  const noct=grantsNoct?1:0;
+  const ef=b+noct;
   const x=Math.round(Math.max(0,w-ef)*1.5*10)/10;
   return{b,noct,x,tot:b+noct+x};
 }
-// Fin de semana: total = horas trabajadas × 2
-function calcHWE(t){
-  if(!t||!t.s)return 0;
-  let e=parseH(t.e),s=parseH(t.s);if(e===null||s===null)return 0;
-  if(s<=e)s+=24;
+// Fin de semana / feriado trabajado: total = horas × 2 (sin noct)
+function calcHWE(entry,exit){
+  const e=parseH(entry),s0=parseH(exit);
+  if(e===null||s0===null)return 0;
+  let s=s0;if(s<=e)s+=24;
   return Math.floor(s-e)*2;
 }
 
@@ -499,16 +553,22 @@ async function generarYDescargar(){
       const rTo=[null,cv('Horas totales',XF.LBL_TOT)];
       let sumB=0,sumN=0,sumX=0;
 
+      const empShifts=SHIFTS[ecfg.leg]||{};
       dias.forEach(dia=>{
         const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
-        const wi=getWidx(dia.ds);const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
-        const ve=getDayVE(ecfg.leg,dia.d);  // 'V', 'E', o null
-        const t=ve?null:getTurno(att,dia.d,isTN); // si tiene V/E, no usar fichaje
+        const ve=getDayVE(ecfg.leg,dia.d);
+        const sh=ve?null:empShifts[dia.d];
+        const isTN=sh&&sh.type==='TN';
+        // Aplicar tolerancia ±20 min al snap horario
+        const entry=sh?applyTol(sh.entry):null;
+        const exit=sh?applyTol(sh.exit):null;
+        const disp=entry?(entry+(exit||'')):'';
+        const grantsNoct=isTN&&!we&&!fer;  // +1 noct solo en hábiles
 
         rT.push(cv(isTN?'TN':'TM',fer?XF.TUR_FER:we?XF.TUR_WE:XF.TUR_DIA));
 
         if(ve){
-          // Vacaciones o Enfermedad — 8 hs, ignora fichaje, sin nocturnas
+          // Vacaciones o Enfermedad — 8 hs
           const xfH=ve==='V'?XF.HOR_VAC:XF.HOR_ENF;
           rH.push(cv(ve,xfH));
           rB.push(cv(8,XF.BAS_VE));
@@ -516,34 +576,37 @@ async function generarYDescargar(){
           rX.push(cv('-',XF.EXT_VE));
           rTo.push(cv(8,XF.TOT_VE));
           sumB+=8;
-        }else if(fer&&(!t||!t.s)){
+        }else if(fer&&!exit){
+          // Feriado sin fichaje completo: 8 hs
           rH.push(cv('F',XF.HOR_FER));rB.push(cv(8,XF.BAS_FER));
           rNo.push(cv('-',XF.NOCT_BLANK));
           rX.push(cv('-',XF.EXT_FER));rTo.push(cv(8,XF.TOT_FER));
           sumB+=8;
-        }else if(we&&t&&t.s){
-          // Fin de semana trabajado: total = horas trabajadas × 2 (sin nocturnas adicional)
-          const hsTot=calcHWE(t);
-          rH.push(cv(t.disp,XF.HOR_WE));
-          rB.push(cv('-',XF.BAS_WE));
+        }else if((we||fer)&&entry&&exit){
+          // Fin de semana / feriado trabajado: × 2, sin noct
+          const hsTot=calcHWE(entry,exit);
+          rH.push(cv(disp,fer?XF.HOR_FER:XF.HOR_WE));
+          rB.push(cv('-',fer?XF.BAS_FER:XF.BAS_WE));
           rNo.push(cv('-',XF.NOCT_BLANK));
-          rX.push(cv('-',XF.EXT_WE));
-          rTo.push(cv(hsTot,XF.TOT_WE));
+          rX.push(cv('-',fer?XF.EXT_FER:XF.EXT_WE));
+          rTo.push(cv(hsTot,fer?XF.TOT_FER:XF.TOT_WE));
           sumB+=hsTot;
-        }else if(we&&(!t||!t.s)){
-          rH.push(cv('',XF.HOR_WE));rB.push(cv('',XF.BAS_WE));
+        }else if(we&&!exit){
+          rH.push(cv(entry||'',XF.HOR_WE));rB.push(cv('',XF.BAS_WE));
           rNo.push(cv('',XF.NOCT_BLANK));
           rX.push(cv('',XF.EXT_WE));rTo.push(cv('',XF.TOT_WE));
-        }else if(t&&t.s){
-          const h=calcH(t,isTN);
-          rH.push(cv(t.disp,XF.HOR));
+        }else if(entry&&exit){
+          // Día hábil con fichaje completo
+          const h=calcH(entry,exit,grantsNoct);
+          rH.push(cv(disp,XF.HOR));
           rB.push(cv(h.b,XF.BAS_DIA));
           rNo.push(cv(h.noct||'-',h.noct?XF.NOCT_DIA:XF.NOCT_BLANK));
           rX.push(cv(h.x||'-',XF.EXT_DIA));
           rTo.push(cv(h.tot,XF.TOT_DIA));
           sumB+=h.b;sumN+=h.noct;sumX+=h.x;
-        }else if(t&&!t.s){
-          rH.push(cv(t.e,XF.HOR_SINSAL));rB.push(cv('',XF.BAS_DIA));
+        }else if(entry&&!exit){
+          // Fichaje incompleto (sólo entrada)
+          rH.push(cv(entry,XF.HOR_SINSAL));rB.push(cv('',XF.BAS_DIA));
           rNo.push(cv('',XF.NOCT_BLANK));
           rX.push(cv('',XF.EXT_DIA));rTo.push(cv('',XF.TOT_DIA));
         }else{
@@ -583,30 +646,30 @@ async function generarYDescargar(){
 
 function renderPrev(dias){
   const act=EMPS.filter(e=>!e.excl);
-  let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">Vac.</th><th class="nr">Enf.</th><th class="nr">Hs Base</th><th class="nr">Hs Noct</th><th class="nr">Hs Extra</th><th class="nr">Total</th><th>Turno</th></tr></thead><tbody>`;
+  let h=`<table><thead><tr><th>Empleado</th><th>Leg.</th><th class="nr">Días</th><th class="nr">TN</th><th class="nr">Vac.</th><th class="nr">Enf.</th><th class="nr">Hs Base</th><th class="nr">Hs Noct</th><th class="nr">Hs Extra</th><th class="nr">Total</th></tr></thead><tbody>`;
   let totG=0;
   act.forEach(ecfg=>{
-    const fe=fileEmps[ecfg.leg];const att=fe?fe.att:{};
-    let d=0,b=0,nh=0,x=0,t=0,hasTN=false,nV=0,nE=0;
+    const empShifts=SHIFTS[ecfg.leg]||{};
+    let d=0,b=0,nh=0,x=0,t=0,nTN=0,nV=0,nE=0;
     dias.forEach(dia=>{
       const we=dia.dow===0||dia.dow===6,fer=FERIAS.has(dia.ds);
-      const wi=getWidx(dia.ds);const isTN=wi>=0&&TN[wi]&&TN[wi].has(ecfg.leg);
-      if(isTN)hasTN=true;
       const ve=getDayVE(ecfg.leg,dia.d);
       if(ve==='V'){nV++;b+=8;t+=8;return;}
       if(ve==='E'){nE++;b+=8;t+=8;return;}
-      if(fer){b+=8;t+=8;return;}
-      const tr=getTurno(att,dia.d,isTN);
-      if(!tr||!tr.s)return;
+      const sh=empShifts[dia.d];
+      const isTN=sh&&sh.type==='TN';
+      if(isTN)nTN++;
+      if(fer&&(!sh||!sh.exit)){b+=8;t+=8;return;}
+      if(!sh||!sh.exit)return;
+      const entry=applyTol(sh.entry),exit=applyTol(sh.exit);
       d++;
-      if(we){const hs=calcHWE(tr);t+=hs;b+=hs;}
-      else{const hh=calcH(tr,isTN);b+=hh.b;nh+=hh.noct;x+=hh.x;t+=hh.tot;}
+      if(we||fer){const hs=calcHWE(entry,exit);t+=hs;b+=hs;}
+      else{const hh=calcH(entry,exit,isTN);b+=hh.b;nh+=hh.noct;x+=hh.x;t+=hh.tot;}
     });
     totG+=t;
-    const tag=hasTN?'<span class="bx btn2">TN</span>':'<span class="bx btm">TM</span>';
-    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr" style="color:#1b6b2a">${nV||'-'}</td><td class="nr" style="color:#7a5200">${nE||'-'}</td><td class="nr">${b}</td><td class="nr" style="color:#5b3a8a">${nh||'-'}</td><td class="nr">${Math.round(x*10)/10||'-'}</td><td class="nr fw">${Math.round(t*10)/10}</td><td>${tag}</td></tr>`;
+    h+=`<tr><td class="fw">${ecfg.n}</td><td style="color:var(--mut);font-size:12px">${ecfg.leg}</td><td class="nr">${d}</td><td class="nr" style="color:#c4620a">${nTN||'-'}</td><td class="nr" style="color:#1b6b2a">${nV||'-'}</td><td class="nr" style="color:#7a5200">${nE||'-'}</td><td class="nr">${b}</td><td class="nr" style="color:#5b3a8a">${nh||'-'}</td><td class="nr">${Math.round(x*10)/10||'-'}</td><td class="nr fw">${Math.round(t*10)/10}</td></tr>`;
   });
-  h+=`</tbody><tfoot><tr><td colspan="8">TOTAL PLANTEL</td><td class="nr">${Math.round(totG*10)/10}</td><td></td></tr></tfoot></table>`;
+  h+=`</tbody><tfoot><tr><td colspan="9">TOTAL PLANTEL</td><td class="nr">${Math.round(totG*10)/10}</td></tr></tfoot></table>`;
   document.getElementById('prevTbl').innerHTML=h;
 }
 </script>
